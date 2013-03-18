@@ -7,7 +7,7 @@ Jf = @(t,x)...
     -sin(x(1) - pi/2).*sin(x(2)-pi/2), cos(x(1) - pi/2).*cos(x(2)-pi/2)];
 
 
-N = 3;
+N = 10;
 grid1d = linspace(0,2*pi,N+1);
 grid1d = grid1d(1:end-1);
 
@@ -15,15 +15,15 @@ grid1d = grid1d(1:end-1);
 ics = [X1(:), X2(:)];
 Nic = size(ics,1);
 
-T = 100;
+T = 10;
 dt = 0.01;
 t = 0:dt:T;
 tc = num2cell(t);
 
 Dets = zeros(size(X1));
 Traces = zeros(size(X1));
-parfor kr = 1:N
-    for kc = 1:N
+for kr = 1:N
+    parfor kc = 1:N
         ic = [ X1(1,kc), X2(kr,1)] ;
         
     % simulate
@@ -42,5 +42,8 @@ parfor kr = 1:N
     cP = squeeze(charpoly_sequence( mJ ));
     Dets(kr, kc) = cP(end);
     Traces(kr, kc) = -cP(end-1);
+    fprintf(1,'Row %03d Col %03d completed\n', kr, kc );
     end
 end
+
+[mhclasses, compr] = meh2d( T, 0, Dets, Traces );
