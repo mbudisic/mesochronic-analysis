@@ -64,8 +64,8 @@ assert( all( size(df) == size(tf) ), 'df and tf should have the same sizes');
 
 compr = tf + df * T;
 mh_flipping = df < 0;
-mh_pure = (df - 4/T^2) > 0;
-not_mh = ~mh_flipping & ~mh_pure;
+mh_pure = df > (4/T^2);
+not_mh = (df > 0) & (df < (4/T^2));
 
 classes = nan(size(df));
 classes(mh_flipping) = 1;
