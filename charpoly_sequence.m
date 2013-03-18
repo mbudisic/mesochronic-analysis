@@ -10,7 +10,7 @@ validateattributes(M, {'numeric','cell'}, {})
 
 % if input matrix was not a cell, convert it to cell
 if ~iscell(M)
-    validateattributes(M, {'numeric'}, {'3d'})
+    validateattributes(M, {'numeric'}, {})
     if  size(M,3) > 1
         M = num2cell(M, [1,2]);
     else
@@ -21,7 +21,7 @@ end
 
 % assert all matrices are numeric and square
 for k = 1:numel(M)
-    validateattributes(M{k}, {'numeric'}, {'square'})
+    validateattributes(M{k}, {'numeric'}, {})
 end
 
 % compute characteristic polynomials
