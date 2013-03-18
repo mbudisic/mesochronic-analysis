@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <deployment-project plugin="plugin.matlabcoder" plugin-version="R2013a">
-  <configuration target="target.matlab.coder" target-name="MEX, C, and C++ Code Generation" name="mcjacobian" location="/Users/mbudisic/Work/MatlabToolbox/meh" file="/Users/mbudisic/Work/MatlabToolbox/meh/mcjacobian.prj" build-checksum="2027733647">
+  <configuration target="target.matlab.coder" target-name="MEX, C, and C++ Code Generation" name="mcjacobian" location="/Users/mbudisic/Work/MatlabToolbox/meh" file="/Users/mbudisic/Work/MatlabToolbox/meh/mcjacobian.prj" build-checksum="3939064032">
     <profile key="profile.mex">
       <param.MergeInstrumentationResults>false</param.MergeInstrumentationResults>
       <param.BuiltInstrumentedMex>false</param.BuiltInstrumentedMex>
@@ -395,8 +395,8 @@
       <param.DefaultFixedPointSignedness />
     </unset>
     <fileset.entrypoints>
-      <file value="${PROJECT_ROOT}/mcjacobian.m" custom-data-expanded="true">
-        <Inputs fileName="mcjacobian.m" functionName="mcjacobian_mat">
+      <file value="${PROJECT_ROOT}/mcjacobian.m" custom-data-expanded="false">
+        <Inputs fileName="mcjacobian.m" functionName="mcjacobian">
           <Input Name="h">
             <Class>double</Class>
             <Size>1 x 1</Size>
@@ -408,6 +408,14 @@
           <Input Name="Ji">
             <Class>double</Class>
             <Size>:inf x :inf x :inf</Size>
+            <Value />
+            <InitialValue />
+            <UserDefined>true</UserDefined>
+            <Complex>false</Complex>
+          </Input>
+          <Input Name="retstep">
+            <Class>double</Class>
+            <Size>1 x 1</Size>
             <Value />
             <InitialValue />
             <UserDefined>true</UserDefined>
