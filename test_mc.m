@@ -21,7 +21,7 @@ Jfp = @(t,x)eps*cos(2*pi*t).*2*pi*...
 
 
 
-N = 100;
+N = 20;
 grid1d = linspace(1/N,1,N)-1/(2*N);
 
 [X1, X2] = meshgrid(grid1d, grid1d);
@@ -29,8 +29,8 @@ ics = [X1(:), X2(:)];
 Nic = size(ics,1);
 
 %T = pi*10;
-T = 1;
-dt = 1e-3;
+T = 10/eps;
+dt = 5e-3/eps;
 t = 0:dt:T;
 tc = num2cell(t);
 
@@ -44,13 +44,13 @@ parfor kr = 1:N
         ic = [ X1(1,kc), X2(kr,1)] ;
         
         % simulate
-        S = ode23t(f, [0, T], ic.');
+        S = ode23t(fp, [0, T], ic.');
         
         % uniform resampling
         y = num2cell( deval(t, S), 1);
         
         % jacobians
-        Ji = cellfun(Jf, tc, y , 'UniformOutput', false);
+        Ji = cellfun(Jfp, tc, y , 'UniformOutput', false);
         
         %    [mJ, ti] = mcjacobian_mex(dt, cat(3,Ji{:}), 1000, 2);
         [mJ, ti] = mcjacobian_mex(dt, cat(3,Ji{:}), fix(length(t)/steps), 2);
@@ -64,7 +64,7 @@ parfor kr = 1:N
     end
     fprintf(1,'Row %03d completed\n', kr);
 end
-
+disp('All done');
 tind = length(t):-fix(length(t)/steps):0;
 Times = t(tind(end:-1:1));
 Times = Times( end-steps+1:end );
@@ -76,4 +76,4 @@ mh = zeros(size(Dets));
 % mh(:,:,step) = mhclasses;
 % end
 
-save 'meh2d_rotation' Dets Traces Times steps N
+save 'meh2d_perturbed' Dets Traces Times steps N
