@@ -33,7 +33,7 @@ F(:,:,1) = Ji(:,:,1);
 
 assert(retstep >= 0, 'Number of return value downsampling (retstep) needs to be positive')
 if retstep > 0
-    retlength = floor( Nt / retstep);
+    retlength = ceil( Nt / retstep);
 elseif retstep == 0
     retlength = 1;
 else

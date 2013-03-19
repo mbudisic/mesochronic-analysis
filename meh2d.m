@@ -20,7 +20,7 @@ validateattributes(tol, {'numeric'},{'scalar','nonnegative','finite'} );
 
 if tol == 0
 tol = 3e-3;
-fprintf(1, 'Tolerance to zero %.1e\n',tol);
+% fprintf(1, 'Tolerance to zero %.1e\n',tol);
 end
 
 %% validate arguments
@@ -64,12 +64,12 @@ assert( all( size(df) == size(tf) ), 'df and tf should have the same sizes');
 
 compr = tf + df * T;
 mh_flipping = df < 0;
-mh_pure = df > (4/T^2);
-not_mh = (df > 0) & (df < (4/T^2));
+mh_pure = df > 4/(T^2);
+not_mh = ~( mh_flipping | mh_pure );
 
 classes = nan(size(df));
-classes(mh_flipping) = 1;
-classes(mh_pure) = -1;
+classes(mh_flipping) = -1;
+classes(mh_pure) = 1;
 classes(not_mh) = 0;
 
 

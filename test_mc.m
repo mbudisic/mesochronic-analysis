@@ -29,17 +29,16 @@ ics = [X1(:), X2(:)];
 Nic = size(ics,1);
 
 %T = pi*10;
-T = 10/eps;
-dt = 5e-3/eps;
+T = 2/eps;
+dt = (pi/2)*1e-3;
 t = 0:dt:T;
 tc = num2cell(t);
 
-steps = 10;
+steps = 20;
 
 Dets = zeros([size(X1), steps]);
 Traces = zeros([size(X1), steps]);
-Times = zeros(steps,1);
-parfor kr = 1:N
+for kr = 1:N
     for kc = 1:N
         ic = [ X1(1,kc), X2(kr,1)] ;
         
@@ -62,18 +61,22 @@ parfor kr = 1:N
             Traces(kr, kc, step) = -cP(step, end-1);
         end
     end
-    fprintf(1,'Row %03d completed\n', kr);
+    fprintf(1,'Row %03d/%03d completed\n', kr,N);
 end
 disp('All done');
 tind = length(t):-fix(length(t)/steps):0;
-Times = t(tind(end:-1:1));
+Times = t(tind(end-1:-1:1));
 Times = Times( end-steps+1:end );
 
 mh = zeros(size(Dets));
+comprs = zeros(size(Dets));
 
-% for step = 1:steps
-% [mhclasses, compr] = meh2d( T, 0, Dets, Traces );
-% mh(:,:,step) = mhclasses;
-% end
+for step = 1:steps
+    [mhclasses, compr] = meh2d( Times(step), 0, ...
+        Dets(:,:,step), ...
+        Traces(:,:,step) );
+    mh(:,:,step) = mhclasses;
+    comprs(:,:,step) = compr;
+end
 
-save 'meh2d_perturbed' Dets Traces Times steps N
+save 'meh2d_perturbed' Dets Traces Times steps N mh comprs X1 X2
