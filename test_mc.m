@@ -1,9 +1,9 @@
-eps = 0.0;
-if eps > 1e-10
-    name = 'meh2d_perturbed';
+if ~exist('eps','var')
+    error('need to define eps perturbation')
 else
-    name = 'meh2d_unperturbed';
+    fprintf(1, 'Running flow with perturbation %.1f', eps);
 end
+name = sprintf('meh2d_eps_%.1f',eps);
 
 u = @(x,y)[ -sin(x).*cos(y); cos(x) .* sin(y) ];
 up = @(x,y)[ cos(x).*sin(y); -sin(x).*cos(y) ];
@@ -17,23 +17,27 @@ Jp = @(x,y)[-sin(x).*sin(y), cos(x).*cos(y);...
 f = @(t,x)u(2*pi*x(1), 2*pi*x(2)) + eps*cos(2*pi*t)*up(2*pi*x(1), 2*pi*x(2));
 Jf = @(t,x)2*pi*J(2*pi*x(1), 2*pi*x(2)) + 2*pi*eps*cos(2*pi*t)*Jp(2*pi*x(1), 2*pi*x(2));
 
-N = 20;
+N = 50;
 grid1d = linspace(1/N,1,N)-1/(2*N);
 
 [X1, X2] = meshgrid(grid1d, grid1d);
 
-figure('Name','Fields')
-subplot(1,2,1);
-F = u(2*pi*X1, 2*pi*X2);
-quiver(X1, X2, F(1:N,:), F(N+1:end,:));
-title('Unperturbed field');
-axis([0,1,0,1]);
+% %% plotting fields
+% figure('Name','Fields')
+% subplot(1,2,1);
+% F = u(2*pi*X1, 2*pi*X2);
+% quiver(X1, X2, F(1:N,:), F(N+1:end,:));
+% title('Unperturbed field');
+% axis([0,1,0,1]);
+% 
+% subplot(1,2,2);
+% G = up(2*pi*X1, 2*pi*X2);
+% quiver(X1, X2, G(1:N,:), G(N+1:end,:));
+% title('Perturbation')
+% axis([0,1,0,1]);
 
-subplot(1,2,2);
-G = up(2*pi*X1, 2*pi*X2);
-quiver(X1, X2, G(1:N,:), G(N+1:end,:));
-title('Perturbation')
-axis([0,1,0,1]);
+%% computation
+
 
 ics = [X1(:), X2(:)];
 Nic = size(ics,1);
@@ -89,4 +93,4 @@ for step = 1:steps
     comprs(:,:,step) = compr;
 end
 
-save(name,'Dets','Traces','Times','steps','N','mh','comprs','X1','X2','eps')
+save([name '.mat'],'Dets','Traces','Times','steps','N','mh','comprs','X1','X2','eps')
