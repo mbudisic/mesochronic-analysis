@@ -17,7 +17,7 @@ for k = 1:steps;
     
     pcolor(X1, X2, mh(:,:,k))
     shading flat
-    axis(2*pi*[0,1,0,1]);
+    axis([0,1,0,1]);
     caxis([-1,1]);
     colormap(c)
     colorbar
@@ -25,8 +25,8 @@ for k = 1:steps;
     ylabel('y')
     title(sprintf('T = %.2f', Times(k)));
     
-    saveas(h1,sprintf('img/%s_%02d_det.png',name,k));
-    saveas(h2,sprintf('img/%s_%02d_typ.png',name,k));
+%    saveas(h1,sprintf('img/%s_%02d_det.png',name,k));
+%    saveas(h2,sprintf('img/%s_%02d_typ.png',name,k));
     
     pause(0.5);
 end

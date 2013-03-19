@@ -14,33 +14,33 @@ J = @(x,y)[ -cos(x).*cos(y), sin(x).*sin(y);...
 Jp = @(x,y)[-sin(x).*sin(y), cos(x).*cos(y);...
      -cos(x).*cos(y), sin(x).*sin(y)];
 
-f = @(t,x)u(x(1), x(2)) + eps*cos(2*pi*t)*up(x(1), x(2));
-Jf = @(t,x)J(x(1), x(2)) + eps*cos(2*pi*t)*Jp(x(1),x(2));
+f = @(t,x)u(2*pi*x(1), 2*pi*x(2)) + eps*cos(2*pi*t)*up(2*pi*x(1), 2*pi*x(2));
+Jf = @(t,x)2*pi*J(2*pi*x(1), 2*pi*x(2)) + 2*pi*eps*cos(2*pi*t)*Jp(2*pi*x(1), 2*pi*x(2));
 
 N = 20;
-grid1d = 2*pi*linspace(1/N,1,N)-1/(2*N);
+grid1d = linspace(1/N,1,N)-1/(2*N);
 
 [X1, X2] = meshgrid(grid1d, grid1d);
 
 figure('Name','Fields')
 subplot(1,2,1);
-F = u(X1, X2);
+F = u(2*pi*X1, 2*pi*X2);
 quiver(X1, X2, F(1:N,:), F(N+1:end,:));
 title('Unperturbed field');
-axis([0,2*pi,0,2*pi]);
+axis([0,1,0,1]);
 
 subplot(1,2,2);
-G = up(X1, X2);
+G = up(2*pi*X1, 2*pi*X2);
 quiver(X1, X2, G(1:N,:), G(N+1:end,:));
 title('Perturbation')
-axis([0,2*pi,0,2*pi]);
+axis([0,1,0,1]);
 
 ics = [X1(:), X2(:)];
 Nic = size(ics,1);
 
 %T = pi*10;
-T = 10;
-dt = 1e-2;
+T = 5;
+dt = 5e-3;
 t = 0:dt:T;
 tc = num2cell(t);
 
@@ -49,7 +49,7 @@ steps = 20;
 Dets = zeros([size(X1), steps]);
 Traces = zeros([size(X1), steps]);
 for kr = 1:N
-    for kc = 1:N
+    parfor kc = 1:N
         ic = [ X1(1,kc), X2(kr,1)] ;
         
         % simulate
