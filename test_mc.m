@@ -1,36 +1,46 @@
-offset = 0.5;
-eps = 0.1;
+eps = 0.0;
+if eps > 1e-10
+    name = 'meh2d_perturbed';
+else
+    name = 'meh2d_unperturbed';
+end
 
+u = @(x,y)[ -sin(x).*cos(y); cos(x) .* sin(y) ];
+up = @(x,y)[ cos(x).*sin(y); -sin(x).*cos(y) ];
 
-f = @(t,x)...
-    [ -sin(2*pi*(x(1) - offset)).*cos(2*pi*(x(2)-offset)) ;...
-    cos(2*pi*(x(1) - offset)).*sin(2*pi*(x(2)-offset))];
+J = @(x,y)[ -cos(x).*cos(y), sin(x).*sin(y);...
+     -sin(x).*sin(y), cos(x).*cos(y) ];
 
-Jf = @(t,x)2*pi*...
-    [ -cos(2*pi*(x(1) - offset)).*cos(2*pi*(x(2)-offset)), sin(2*pi*(x(1) - offset)).*sin(2*pi*(x(2)-offset));...
-    -sin(2*pi*(x(1) - offset)).*sin(2*pi*(x(2)-offset)), cos(2*pi*(x(1) - offset)).*cos(2*pi*(x(2)-offset))];
+Jp = @(x,y)[-sin(x).*sin(y), cos(x).*cos(y);...
+     -cos(x).*cos(y), sin(x).*sin(y)];
 
-
-fp = @(t,x)eps*cos(2*pi*t).*...
-    [ -sin(2*pi*(x(1) - offset)).*cos(2*pi*(x(2)-offset)) ;...
-    cos(2*pi*(x(1) - offset)).*sin(2*pi*(x(2)-offset))];
-
-Jfp = @(t,x)eps*cos(2*pi*t).*2*pi*...
-    [ -cos(2*pi*(x(1) - offset)).*cos(2*pi*(x(2)-offset)), sin(2*pi*(x(1) - offset)).*sin(2*pi*(x(2)-offset));...
-    -sin(2*pi*(x(1) - offset)).*sin(2*pi*(x(2)-offset)), cos(2*pi*(x(1) - offset)).*cos(2*pi*(x(2)-offset))];
-
-
+f = @(t,x)u(x(1), x(2)) + eps*cos(2*pi*t)*up(x(1), x(2));
+Jf = @(t,x)J(x(1), x(2)) + eps*cos(2*pi*t)*Jp(x(1),x(2));
 
 N = 20;
-grid1d = linspace(1/N,1,N)-1/(2*N);
+grid1d = 2*pi*linspace(1/N,1,N)-1/(2*N);
 
 [X1, X2] = meshgrid(grid1d, grid1d);
+
+figure('Name','Fields')
+subplot(1,2,1);
+F = u(X1, X2);
+quiver(X1, X2, F(1:N,:), F(N+1:end,:));
+title('Unperturbed field');
+axis([0,2*pi,0,2*pi]);
+
+subplot(1,2,2);
+G = up(X1, X2);
+quiver(X1, X2, G(1:N,:), G(N+1:end,:));
+title('Perturbation')
+axis([0,2*pi,0,2*pi]);
+
 ics = [X1(:), X2(:)];
 Nic = size(ics,1);
 
 %T = pi*10;
-T = 2/eps;
-dt = (pi/2)*1e-3;
+T = 10;
+dt = 1e-2;
 t = 0:dt:T;
 tc = num2cell(t);
 
@@ -43,13 +53,13 @@ for kr = 1:N
         ic = [ X1(1,kc), X2(kr,1)] ;
         
         % simulate
-        S = ode23t(fp, [0, T], ic.');
+        S = ode23t(f, [0, T], ic.');
         
         % uniform resampling
         y = num2cell( deval(t, S), 1);
         
         % jacobians
-        Ji = cellfun(Jfp, tc, y , 'UniformOutput', false);
+        Ji = cellfun(Jf, tc, y , 'UniformOutput', false);
         
         %    [mJ, ti] = mcjacobian_mex(dt, cat(3,Ji{:}), 1000, 2);
         [mJ, ti] = mcjacobian_mex(dt, cat(3,Ji{:}), fix(length(t)/steps), 2);
@@ -79,4 +89,4 @@ for step = 1:steps
     comprs(:,:,step) = compr;
 end
 
-save 'meh2d_perturbed' Dets Traces Times steps N mh comprs X1 X2
+save(name,'Dets','Traces','Times','steps','N','mh','comprs','X1','X2','eps')

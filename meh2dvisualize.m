@@ -1,4 +1,5 @@
-load 'meh2d_unperturbed'
+name = 'meh2d_unperturbed';
+load(name)
 close all; 
 
 h1 = figure('Name','Det');
@@ -16,13 +17,16 @@ for k = 1:steps;
     
     pcolor(X1, X2, mh(:,:,k))
     shading flat
-    axis([0,1,0,1]);
+    axis(2*pi*[0,1,0,1]);
     caxis([-1,1]);
     colormap(c)
     colorbar
-    xlabel('X')
-    ylabel('Y')
+    xlabel('x')
+    ylabel('y')
     title(sprintf('T = %.2f', Times(k)));
+    
+    saveas(h1,sprintf('img/%s_%02d_det.png',name,k));
+    saveas(h2,sprintf('img/%s_%02d_typ.png',name,k));
     
     pause(0.5);
 end
