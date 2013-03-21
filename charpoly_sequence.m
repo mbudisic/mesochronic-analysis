@@ -25,7 +25,7 @@ for k = 1:numel(M)
 end
 
 % compute characteristic polynomials
-P = squeeze(cellfun( @charpoly, M, 'uniformoutput',false ));
+P = squeeze(cellfun( @poly, M, 'uniformoutput',false ));
 
 if isvector(P)
 try

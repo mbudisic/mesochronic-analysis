@@ -1,40 +1,33 @@
-function [classes,compr] = meh2d( T, tol , varargin )
-% meh3d( T, tol , df, mf )
+function [classes,compr] = meh2d( T, varargin )
+% meh2d( T, tol , ... )
 %
 % inputs: 
 %
 % T - integration period
-% tol - tolerance of zero (set to 0 for default value)
 % df - matrix/vector of determinants of Jacobians
 % tf - matrix/vector of traces of Jacobians
 %
 % OR
 %
 % T - integration period
-% tol - tolerance of zero (set to 0 for default value)
-% J - cell matrix/vector of 3x3 Jacobian matrices
+% J - cell array of 2x2 Jacobian matrices (if a single matrix is to be
+%     analyzed, pass it as {J})
 %
 
 validateattributes(T, {'numeric'},{'scalar','nonnegative','finite'} );
-validateattributes(tol, {'numeric'},{'scalar','nonnegative','finite'} );
-
-if tol == 0
-tol = 3e-3;
-% fprintf(1, 'Tolerance to zero %.1e\n',tol);
-end
 
 %% validate arguments
-assert( numel(varargin)  <= 2, 'Too many input arguments' )
-assert( numel(varargin)  > 0, 'Not enough input arguments' )
+assert( numel(varargin)  <= 2, 'Too many input arguments (consult help)' )
+assert( numel(varargin)  > 0, 'Not enough input arguments (consult help)' )
 
 % inputs are Jacobian matrices
-if numel(varargin) == 1 
-    
+if numel(varargin) == 1
     J = varargin{1};
+    validateattributes( J, {'cell'},{})
     for k = 1:numel(J)
-        validateattributes( J{k} , {'numeric'}, {'square', '2d', 'nrows', 3} ); % make sure inputs are 2d 3x3 matrices
+        validateattributes( J{k} , {'numeric'}, {'square', '2d', 'nrows', 2} ); % make sure inputs are 2d 2x2 matrices
     end
-    P = squeeze( charpoly_sequence(J) ); % extract characteristic polynomials
+    P = charpoly_sequence(J); % extract characteristic polynomials
     
     % extract determinant and sum of minors
     if iscell(P) 
