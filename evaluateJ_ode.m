@@ -11,19 +11,21 @@ function mJ = evaluateJ_ode( order, ic, f, Jf, T, h )
 
 validateattributes(ic, {'numeric'}, {'column'})
 
-tc = 0:h:T;
-
+t = 0:h:T;
+tc = num2cell(t);
 % simulate
 opts = odeset('vectorized','on');
-S = ode23t(f, [0, T], ic, opts);
+[~, yout] = ode23t(f, t, ic, opts);
 
 %fprintf(1, 'Min dt:%e, Max dt:%e \n', min(diff(S.x)), max(diff(S.x)));
 
 % uniform resampling
-y = num2cell( deval(tc, S), 1);
+y = num2cell(yout.',1);
+
 
 % jacobians
-Ji = cellfun(Jf, num2cell(tc), y , 'UniformOutput', false);
+Ji = cellfun(Jf, tc, y , 'UniformOutput', false);
+Ji = cat(3, Ji{:});
 
 %    [mJ, ti] = mcjacobian_mex(dt, cat(3,Ji{:}), 1000, 2);
-mJ = mcjacobian_mex(h, cat(3,Ji{:}), 0, order);
+mJ = mcjacobian_mex(h, Ji, 0, order);
