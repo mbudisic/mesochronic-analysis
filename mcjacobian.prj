@@ -114,7 +114,7 @@
       <param.outputfile>${PROJECT_ROOT}/codegen/mex/mcjacobian/mcjacobian_mex.mexa64</param.outputfile>
       <param.version>R2012a</param.version>
       <param.HasECoderFeatures>true</param.HasECoderFeatures>
-      <param.mex.mainhtml>/home/mbudisic/Research/meh/codegen/mex/mcjacobian/html/index.html</param.mex.mainhtml>
+      <param.mex.mainhtml>/home/mbudisic/Research/MatlabToolbox/meh/codegen/mex/mcjacobian/html/index.html</param.mex.mainhtml>
       <param.grt.mainhtml/>
       <param.RebuildBeforeTesting>true</param.RebuildBeforeTesting>
       <param.CallGeneratedCodeFromTest>true</param.CallGeneratedCodeFromTest>
@@ -215,7 +215,7 @@
       <fileset.package/>
       <build-deliverables>
       
-         <file name="mcjacobian_mex.mexa64" location="${PROJECT_ROOT}/codegen/mex/mcjacobian" optional="false">/home/mbudisic/Research/meh/codegen/mex/mcjacobian/mcjacobian_mex.mexa64</file>
+         <file name="mcjacobian_mex.mexa64" location="${PROJECT_ROOT}/codegen/mex/mcjacobian" optional="false">/home/mbudisic/Research/MatlabToolbox/meh/codegen/mex/mcjacobian/mcjacobian_mex.mexa64</file>
     
       </build-deliverables>
       <workflow/>

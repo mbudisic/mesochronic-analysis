@@ -1,4 +1,4 @@
-function [classes,compr] = meh2d( T, varargin )
+function [classes,compr, spectral] = meh2d( T, varargin )
 % meh2d( T, tol , ... )
 %
 % inputs: 
@@ -13,6 +13,12 @@ function [classes,compr] = meh2d( T, varargin )
 % J - cell array of 2x2 Jacobian matrices (if a single matrix is to be
 %     analyzed, pass it as {J})
 %
+% 
+% returns:
+% classes - classification into mesohyperbolic types
+% compr - numerical compressibility
+% spectral.dets - determinants (if passed as input, this is just a copy)
+% spectral.traces - traces (if passed as input, this is just a copy)
 
 validateattributes(T, {'numeric'},{'scalar','nonnegative','finite'} );
 
@@ -25,7 +31,7 @@ if numel(varargin) == 1
     J = varargin{1};
     validateattributes( J, {'cell'},{})
     for k = 1:numel(J)
-        validateattributes( J{k} , {'numeric'}, {'square', '2d', 'nrows', 2} ); % make sure inputs are 2d 2x2 matrices
+        validateattributes( J{k} , {'numeric'}, { '2d', 'nrows', 2, 'ncols',2} ); % make sure inputs are 2d 2x2 matrices
     end
     P = charpoly_sequence(J); % extract characteristic polynomials
     
@@ -64,5 +70,9 @@ classes = nan(size(df));
 classes(mh_flipping) = -1;
 classes(mh_pure) = 1;
 classes(not_mh) = 0;
+
+spectral.dets = df;
+spectral.traces = tf;
+
 
 
