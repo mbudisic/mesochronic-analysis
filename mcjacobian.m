@@ -6,10 +6,10 @@ function [retval_jacs, retval_steps] = mcjacobian(h, Ji, retstep, order)
 % h - timestep (double)
 % Ji - cell-array of instantaneous Jacobian matrices evaluated at times
 %      uniformly spaced by h
-% retstep - spacing between returned steps
-%            - if 0, only the last step is returned
-%            - if > 0, every retstep is returned, with last step always
-%                      returned
+% steps - vector indices of returned steps, 0-started, mod(, Nsteps)
+%       - 0 - first step
+%       - -1 - last step
+%       - 
 % order - order of integration, currently 1 or 2
 %
 % returns:
@@ -30,23 +30,25 @@ F = zeros( [Jisize(1:2), order+1] );
 % zeroth step
 F(:,:,1) = Ji(:,:,1);
 
-
-assert(retstep >= 0, 'Number of return value downsampling (retstep) needs to be positive')
-if retstep > 0
-    retlength = ceil( Nt / retstep);
-elseif retstep == 0
-    retlength = 1;
-else
-    error('Retstep not properly formatted')
+if isempty(retstep)
+    retstep = -1;
 end
+
+% take the mod of retstep to rewrap
+assert(isvector(retstep), 'retstep has to be a vector');
+retstep = mod(retstep, Nt);
+retstep = unique(retstep);
+
+retlength = length(retstep);
+
 
 % storage for return values
 retval_steps = zeros(1, retlength);
 retval_jacs = zeros( Jisize(1), Jisize(2), retlength);
 
 maxStep = Nt-1;
-savecounter = 1;
-% step loop - this is not an index
+% step loop - zero indexed, 0 is the initial time (not computed)
+%             maxStep is the final time
 for n = 1:maxStep
     
     % move F a step further, dropping oldest record, and inserting empty to the
@@ -66,18 +68,19 @@ for n = 1:maxStep
     end
     
     % detect a saving step
-    if retstep > 0 && mod( maxStep - n, retstep ) == 0
-        retval_steps(savecounter) = n;
-        retval_jacs(:,:,savecounter) = F(:,:,1);
-        savecounter = savecounter+1;
+    savestep = find(n == retstep, 1, 'first');
+    if ~isempty(savestep)
+        savestep = min(savestep);
+    else
+        savestep = NaN;
+    end
+    
+    if ~isnan(savestep)
+        retval_steps(savestep) = n;
+        retval_jacs(:,:,savestep) = F(:,:,1);
     end
 end
 
-% if only the last step was requested for saving
-if retstep == 0
-    retval_steps = n;
-    retval_jacs = F(:,:,1);
-end
 
 
 function retval = stepme1(mf)
