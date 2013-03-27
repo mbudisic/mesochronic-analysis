@@ -17,7 +17,9 @@ t = 0:h:Tmax;
 tc = num2cell(t);
 % simulate
 opts = odeset('vectorized','on');
-[~, yout] = ode23t(f, t, ic, opts);
+[tout, yout] = ode23t(f, t, ic, opts);
+
+assert( norm( t - tout.', Inf) < 1e-12, 'Output times do not match input times');
 
 %fprintf(1, 'Min dt:%e, Max dt:%e \n', min(diff(S.x)), max(diff(S.x)));
 
