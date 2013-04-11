@@ -25,14 +25,47 @@ assert( norm( t - tout.', Inf) < 1e-12, 'Output times do not match input times')
 
 % uniform resampling
 y = num2cell(yout.',1);
+% 
+% 
+% % jacobians
+% Ji = cellfun(Jf, tc, y , 'UniformOutput', false);
+% Ji = cat(3, Ji{:});
 
-
-% jacobians
-Ji = cellfun(Jf, tc, y , 'UniformOutput', false);
-Ji = cat(3, Ji{:});
+Ji = jacobian_fd(f, tout, yout.', 1e-9);
 
 % return steps are multiples of resampling interval
 retstep = fix(T/h);
 
 %    [mJ, ti] = mcjacobian_mex(dt, cat(3,Ji{:}), 1000, 2);
 mJ = mcjacobian_mex(h, Ji, retstep, order);
+
+function Ji = jacobian_fd(f, tout, yout, delta)
+% jacobian_fd
+%
+% evaluate the instantaneous jacobian by finite difference
+%
+
+Np = size(yout,2);
+assert(size(yout,1) == 2)
+Ji = zeros(2,2,Np);
+
+for k = 1:Np
+    
+    t = tout(k);
+    point = yout(:,k);
+    
+    assert(iscolumn(point))
+    
+    dvar = [ 1, 0; -1, 0; 0, 1; 0, -1].';
+    
+    for n = 1:size(dvar,2)
+        f_var(:,n) = f( t, point + dvar(:,n) );
+    end
+    
+    Ji(:, :, k) = [f_var(:, 1) - f_var(:,2), f_var(:, 3) - f_var(:,4)]/(2*delta);
+end
+
+
+
+
+
