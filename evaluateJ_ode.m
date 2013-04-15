@@ -1,4 +1,4 @@
-function [mJ, sol] = evaluateJ_ode( order, ic, f, dp, T, h )
+function [mJ, sol] = evaluateJ_ode( order, ic, f, T, h, dp )
 % EVALUATEJ_ODE
 %
 % Evaluate mesochronic Jacobian using direct method.
@@ -10,6 +10,9 @@ function [mJ, sol] = evaluateJ_ode( order, ic, f, dp, T, h )
 % h - resampling time
 
 validateattributes(ic, {'numeric'}, {'column'})
+
+assert( h < min(T), 'time step should be smaller than integration length' )
+assert( dp < 1, 'dp should be small')
 
 Tmax = max(T);
 
