@@ -4,8 +4,8 @@ function [retval_jacs, retval_steps] = mcjacobian(h, Ji, retstep, order)
 % Compute the mesochronic Jacobian evolved over the span t.
 %
 % h - timestep (double)
-% Ji - cell-array of instantaneous Jacobian matrices evaluated at times
-%      uniformly spaced by h
+% Ji - array of instantaneous Jacobian matrices evaluated at times
+%      uniformly spaced by h (each (:,:, k) is a Jacobian )
 % steps - vector indices of returned steps, 0-started, mod(, Nsteps)
 %       - 0 - first step
 %       - -1 - last step
