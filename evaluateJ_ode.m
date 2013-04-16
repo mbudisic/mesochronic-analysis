@@ -19,7 +19,7 @@ Tmax = max(T);
 t = 0:h:Tmax;
 tc = num2cell(t);
 % simulate
-opts = odeset('vectorized','on');
+opts = odeset('vectorized','on','Refine',6,'RelTol',1e-4,'AbsTol',1e-6);
 [tout, yout] = ode23t(f, t, ic, opts);
 
 sol.t = tout;
