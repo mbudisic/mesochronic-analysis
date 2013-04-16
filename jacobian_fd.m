@@ -1,12 +1,18 @@
 function Ji = jacobian_fd(f, t, y, delta)
 % JACOBIAN_FD(f, t, y, delta)
 %
-% Evaluate the instantaneous jacobian by finite difference.
+% Evaluate the instantaneous jacobian by central finite difference.
 %
 % f - @(t,x) vector field
 % t - Npoints x 1 column vector of times
 % y - Npoints x Ndim matrix of states
 % delta - finite variation
+%
+% optimal delta is 
+% delta = ( 3 * eps * norm(f) / 2 norm( d^3 f )  )^(1/3)
+% where norm(f) is infty-bound on values of f
+%       norm(d^3 f) is infty-bound on third derivative of f
+%       eps - machine precision (eps command in matlab)
 
 validateattributes(t, {'double'}, {'real','column'});
 
