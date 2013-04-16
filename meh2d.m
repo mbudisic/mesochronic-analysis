@@ -1,19 +1,13 @@
-function [classes,compr, spectral] = meh2d( T, varargin )
+function [classes, compr, spectral] = meh2d( T, J )
 % meh2d( T, tol , ... )
 %
-% inputs: 
-%
-% T - integration period
-% df - matrix/vector of determinants of Jacobians
-% tf - matrix/vector of traces of Jacobians
-%
-% OR
+% inputs:
 %
 % T - integration period
 % J - cell array of 2x2 Jacobian matrices (if a single matrix is to be
 %     analyzed, pass it as {J})
 %
-% 
+%
 % returns:
 % classes - classification into mesohyperbolic types
 % compr - numerical compressibility
@@ -21,35 +15,23 @@ function [classes,compr, spectral] = meh2d( T, varargin )
 % spectral.traces - traces (if passed as input, this is just a copy)
 
 validateattributes(T, {'numeric'},{'scalar','nonnegative','finite'} );
-
-%% validate arguments
-assert( numel(varargin)  <= 2, 'Too many input arguments (consult help)' )
-assert( numel(varargin)  > 0, 'Not enough input arguments (consult help)' )
+validateattributes(J, {'cell'}, {});
+cellfun( @(x)validateattributes(x, {'numeric'}, {}), J)
 
 % inputs are Jacobian matrices
-if numel(varargin) == 1
-    J = varargin{1};
-    validateattributes( J, {'cell'},{})
-    for k = 1:numel(J)
-        validateattributes( J{k} , {'numeric'}, { '2d', 'nrows', 2, 'ncols',2} ); % make sure inputs are 2d 2x2 matrices
-    end
-    P = charpoly_sequence(J); % extract characteristic polynomials
-    
-    % extract determinant and sum of minors
-    if iscell(P) 
-%        tf = cellfun( @(x)(-x(2)), P );
-       tf = cellfun( @(x)(-x(2)), P );
-       df = cellfun( @(x)(x(3)), P );       
-    else
-       tf = -P(:,2);
-       df = P(:,3);
-    end
-
-% inputs are df and mf - validate them
+P = charpoly_sequence(J); % extract characteristic polynomials
+% extract determinant and sum of minors
+if iscell(P)
+    %        tf = cellfun( @(x)(-x(2)), P );
+    tf = cellfun( @(x)(-x(2)), P );
+    df = cellfun( @(x)(x(3)), P );
 else
-    df = varargin{1};
-    tf = varargin{2};
+    tf = -P(:,2);
+    df = P(:,3);
 end
+
+% normalcy
+nml = normalcy( J );
 
 validateattributes( df, {'numeric'},{'real','finite'});
 validateattributes( tf, {'numeric'},{'real','finite'});
@@ -57,7 +39,7 @@ validateattributes( tf, {'numeric'},{'real','finite'});
 assert( all( size(df) == size(tf) ), 'df and tf should have the same sizes');
 
 
-%% computation of mesohyperbolicity    
+%% computation of mesohyperbolicity
 
 % incompressibility deviation = "compressibility"
 
@@ -73,6 +55,12 @@ classes(not_mh) = 0;
 
 spectral.dets = df;
 spectral.traces = tf;
+spectral.nml = nml;
 
+function retval = normalcy( M )
 
+retval = zeros(size(M));
+for k = 1:numel(M)
+    retval(k) = norm( M{k}*M{k}' - M{k}' * M{k} );
+end
 
