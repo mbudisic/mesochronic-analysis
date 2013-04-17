@@ -61,6 +61,6 @@ function retval = normalcy( M )
 
 retval = zeros(size(M));
 for k = 1:numel(M)
-    retval(k) = norm( M{k}*M{k}' - M{k}' * M{k} );
+    retval(k) = norm( M{k}*ctranspose(M{k}) -  ctranspose(M{k}) * M{k} );
 end
 
