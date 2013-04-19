@@ -30,6 +30,14 @@ else
     df = Cp(:,3);
 end
 
+if ~iscell(Mp)
+    Mp = mat2cell(Mp, ones(1,size(Mp,1)), size(Mp,2));
+end
+
+
+spectral.defect = matdefect(Mp);
+
+
 % normalcy
 nml = normalcy( J );
 
@@ -56,6 +64,32 @@ classes(not_mh) = 0;
 spectral.dets = df;
 spectral.traces = tf;
 spectral.nml = nml;
+
+function retval = matdefect( Mp )
+% Mp is a cell array minimal polynomials
+
+validateattributes(Mp, {'cell'},{})
+
+retval = zeros(size(Mp));
+for k = 1:numel(Mp)
+    retval(k) = rootmindist( roots(Mp{k}) );
+end
+
+function d = rootmindist(v)
+
+if ~iscolumn(v)
+    v = v.';
+end
+
+% repeat vector to the matrix
+V = repmat( v, [1, numel(v)]);
+
+% pairwise distance between elements
+D = abs(V - V.');
+
+% minimal off-diagonal distance (diagonal is obviously zero)
+d =min( D( eye(numel(v)) ~= 1 ) );
+
 
 function retval = normalcy( M )
 
