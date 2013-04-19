@@ -19,15 +19,15 @@ validateattributes(J, {'cell'}, {});
 cellfun( @(x)validateattributes(x, {'numeric'}, {}), J)
 
 % inputs are Jacobian matrices
-P = charpoly_sequence(J); % extract characteristic polynomials
+[Cp, Mp] = matpolys(J); % extract characteristic polynomials
 % extract determinant and sum of minors
-if iscell(P)
+if iscell(Cp)
     %        tf = cellfun( @(x)(-x(2)), P );
-    tf = cellfun( @(x)(-x(2)), P );
-    df = cellfun( @(x)(x(3)), P );
+    tf = cellfun( @(x)(-x(2)), Cp );
+    df = cellfun( @(x)(x(3)), Cp );
 else
-    tf = -P(:,2);
-    df = P(:,3);
+    tf = -Cp(:,2);
+    df = Cp(:,3);
 end
 
 % normalcy

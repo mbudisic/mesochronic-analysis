@@ -1,6 +1,6 @@
-function P = charpoly_sequence( M )
-% CHARPOLY_SEQUENCE
-% Compute characteristic polynomials of a sequence of matrices.
+function [Cp, Mp] = matpolys( M )
+% MATPOLYS
+% Compute characteristic and minimal polynomials of a sequence of matrices.
 %
 % M is either a cell array of square matrices
 % or a (N,N,M) array, where each (:,:,k) is a matrix whose characteristic
@@ -25,11 +25,20 @@ for k = 1:numel(M)
 end
 
 % compute characteristic polynomials
-P = squeeze(cellfun( @poly, M, 'uniformoutput',false ));
+Cp = squeeze(cellfun( @poly, M, 'uniformoutput',false ));
+Mp = squeeze(cellfun( @minpoly, M, 'uniformoutput',false ));
 
-if isvector(P)
+
+if isvector(Cp)
 try
-    P = cell2mat(P);
+    Cp = cell2mat(Cp);
+catch
+end
+end
+
+if isvector(Mp)
+try
+    Mp = cell2mat(Mp);
 catch
 end
 end
