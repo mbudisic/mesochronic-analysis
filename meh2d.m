@@ -66,13 +66,24 @@ spectral.traces = tf;
 spectral.nml = nml;
 
 function retval = matdefect( Mp )
+% Computes how close a matrix is to being defective.
+% Matrix is defective only if its minimal polynomial has distinct roots.
+% This function computes minimal distance between roots of the minimal
+% polynomial, scaled with the maximum root.
+%
 % Mp is a cell array minimal polynomials
 
 validateattributes(Mp, {'cell'},{})
 
 retval = zeros(size(Mp));
 for k = 1:numel(Mp)
-    retval(k) = rootmindist( roots(Mp{k}) );
+    myroots = roots(Mp{k});
+    maxroot = max(abs(myroots));
+    if maxroot == 0
+        retval(k) = 0;
+    else
+        retval(k) = rootmindist( myroots )/maxroot;
+    end
 end
 
 function d = rootmindist(v)
