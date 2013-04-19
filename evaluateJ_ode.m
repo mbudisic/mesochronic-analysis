@@ -11,7 +11,8 @@ function [mJ, sol] = evaluateJ_ode( order, ic, f, T, h, dp )
 
 validateattributes(ic, {'numeric'}, {'column'})
 
-assert( h < min(T), 'time step should be smaller than integration length' )
+assert( min(diff(T)) > h, 'return steps should differ by more than integration step')
+assert( h <= min(T), 'time step should be smaller than integration length' )
 assert( dp < 1, 'dp should be small')
 
 Tmax = max(T);
@@ -42,8 +43,6 @@ Ji = jacobian_fd(f, tout, yout, dp);
 
 % return steps are multiples of resampling interval
 retstep = fix(T/h);
-
 %    [mJ, ti] = mcjacobian_mex(dt, cat(3,Ji{:}), 1000, 2);
 mJ = mcjacobian_mex(h, Ji, retstep, order);
-
 
