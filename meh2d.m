@@ -19,7 +19,7 @@ validateattributes(J, {'cell'}, {});
 cellfun( @(x)validateattributes(x, {'numeric'}, {}), J)
 
 % inputs are Jacobian matrices
-[Cp, Mp] = matpolys(J); % extract characteristic polynomials
+[Cp, Mp] = matpolys(J); % extract characteristic and minimal polynomials
 % extract determinant and sum of minors
 if iscell(Cp)
     %        tf = cellfun( @(x)(-x(2)), P );
