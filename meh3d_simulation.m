@@ -42,19 +42,25 @@ Ndim = size(ics,2);
 
 filename = sprintf('system%s_%s_T_%.1f_N_%03d',name,method, max(T), N);
 
+Jacobians = cell(Npoints,1);
+
+
+
+
 Dets = zeros([Npoints, length(T)]);
 Traces = zeros(size(Dets));
 Meh = zeros(size(Dets));
 Compr = zeros(size(Dets));
 Nml = zeros(size(Dets));
 Defect = zeros( size(Dets));
-Jacobians = cell(Npoints,1);
 
 if Ndim == 3
     TrCof = zeros(size(Dets));
 end
 
-for k = 1:Npoints
+% first just compute Jacobians
+disp([filename ': Started Jacobian computation.']);
+parfor k = 1:Npoints
     ic = ics(k, :).';
     
     if strcmpi(method,'ode')
@@ -62,6 +68,15 @@ for k = 1:Npoints
     else
         mJ = evaluateJ_fd( ic, f, T, h, dp );
     end
+    
+    Jacobians{k} = mJ;
+
+end
+
+disp([filename ': Jacobians computed. Started classification.']);
+
+% evaluate quantifiers for Jacobians
+parfor k = 1:Npoints
     
     myDets = zeros(1,length(T));
     myTraces = zeros(size(myDets));
@@ -73,25 +88,29 @@ for k = 1:Npoints
     if Ndim == 3
         myTrCof = zeros(size(myDets));
     end
+
     
     for n = 1:length(T)
         
-        [classes, compr, spectral] = meh3d( T(n), {mJ(:,:,n)} );
+        [classes, compr, spectral] = meh3d( T(n), {Jacobians{k}(:,:,n)} );
         
-        myDets(n) = spectral.dets;
-        myTraces(n) = spectral.traces;
-        myMeh(n) = classes;
-        myCompr(n) = compr;
-        myNml(n) = spectral.nml;
-        myDefect(n) = spectral.defect;
-        
+        % spectral
+        myDets(n) = spectral.Dets;
+        myTraces(n) = spectral.Traces;
         if Ndim == 3
-            myTrCof(n) = spectral.trcofs;
+            myTrCof(n) = spectral.TrCofs;
         end
+
+        % quants
+        myCompr(n) = quants.compr;
+        myNml(n) = quants.nml;
+        myDefect(n) = quants.defect;
+        
+        % classes
+        myMeh(n) = classes;
         
     end
     
-    Jacobians{k} = mJ;
     Dets(k,:) = myDets(:);
     Traces(k,:) = myTraces(:);
     Meh(k,:) = myMeh(:);
@@ -105,9 +124,10 @@ for k = 1:Npoints
     
     
 end
-disp('All done');
+disp([filename ': All done']);
 
 retval.Jacobians = Jacobians;
+
 retval.Dets = Dets;
 retval.Traces = Traces;
 retval.Meh = Meh;
@@ -126,8 +146,6 @@ retval.f = f;
 if Ndim == 3
     retval.TrCof = TrCof;
 end
-
-
 
 save([filename '.mat'], '-struct','retval')
 
