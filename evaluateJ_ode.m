@@ -12,9 +12,9 @@ function [mJ, sol] = evaluateJ_ode( order, ic, f, t0, T, h, dp )
 % dp - finite difference used for evaluation of the instantaneous Jacobian
 
 validateattributes(ic, {'numeric'}, {'column'})
-validateattributes(t0, {'numeric'}, {'scalar'})
-
-assert( min(diff(T)) > h, 'return steps should differ by more than integration step')
+validateattributes(t0, {'numeric'}, {'scalar','real'})
+T = sort(T);
+assert( min(diff([t0;T(:)])) > h, 'return steps should differ by more than integration step')
 assert( h <= min(T), 'time step should be smaller than integration length' )
 assert( dp < 1, 'dp should be small')
 
