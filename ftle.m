@@ -3,7 +3,7 @@ function ftle_val = ftle( T, J )
 %
 % 
 
-validateattributes(J, {'numeric'},  {'square'});
+validateattributes(J, {'numeric'},  {});
 validateattributes(T, {'numeric'}, {'positive'});
 
 J_Phi = eye(size(J)) + T*J; % convert mesochronic Jacobian to flow map Jacobian

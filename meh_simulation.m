@@ -106,6 +106,7 @@ Compr = zeros(size(Dets));
 NonNml = zeros(size(Dets));
 Defect = zeros( size(Dets));
 TrCof = zeros(size(Dets));
+FTLE = zeros( size(Dets));
 
 
 if Ndim == 3
@@ -125,6 +126,7 @@ parfor m = 1:Npoints
     myCompr = zeros(size(myDets));
     myNonNml = zeros(size(myDets));
     myDefect = zeros(size(myDets));
+    myFTLE = zeros(size(myDets));
     
     myTrCof = zeros(size(myDets));
     myJacobians = Jacobians{m};
@@ -144,6 +146,7 @@ parfor m = 1:Npoints
         myCompr(n) = quants.Compr;
         myNonNml(n) = quants.NonNml;
         myDefect(n) = quants.Defect;
+        myFTLE(n) = quants.FTLE;
         
         % classes
         myMeh(n) = classes;
@@ -155,6 +158,7 @@ parfor m = 1:Npoints
     Meh(m,:) = myMeh(:);
     Compr(m,:) = myCompr(:);
     NonNml(m,:) = myNonNml(:);
+    FTLE(m,:) = myFTLE(:);
     Defect(m,:) = myDefect(:);
     TrCof(m,:) = myTrCof(:);
     
@@ -168,6 +172,7 @@ retval.Traces = Traces;
 retval.Meh = Meh;
 retval.Compr = Compr;
 retval.NonNml = NonNml;
+retval.FTLE = FTLE;
 retval.Defect = Defect;
 retval.ics = ics;
 retval.T  = T;
