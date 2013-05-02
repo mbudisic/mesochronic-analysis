@@ -1,5 +1,5 @@
-function retval = meh3d_simulation(f, t0, T, method, ics, h, dp, order, tol,  name)
-% meh3d_simulation(f, t0, T, method, N, h, dp, order, name)
+function retval = meh_simulation(f, t0, T, method, ics, h, dp, order, tol,  name)
+% meh_simulation(f, t0, T, method, N, h, dp, order, name)
 %
 % Compute mesohyperbolicity for the vector field f. (2d on [-0.5,0.5]^2
 % grid for now)
