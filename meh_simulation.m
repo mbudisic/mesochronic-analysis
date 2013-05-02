@@ -107,7 +107,7 @@ NonNml = zeros(size(Dets));
 NonDefect = zeros( size(Dets));
 TrCof = zeros(size(Dets));
 FTLE = zeros( size(Dets));
-
+Hyp =  zeros( size(Dets));
 
 if Ndim == 3
     disp('Using 3d mesohyperbolicity')
@@ -127,6 +127,7 @@ parfor m = 1:Npoints
     myNonNml = zeros(size(myDets));
     myNonDefect = zeros(size(myDets));
     myFTLE = zeros(size(myDets));
+    myHyp = zeros(size(myDets));
     
     myTrCof = zeros(size(myDets));
     myJacobians = Jacobians{m};
@@ -147,6 +148,7 @@ parfor m = 1:Npoints
         myNonNml(n) = quants.NonNml;
         myNonDefect(n) = quants.NonDefect;
         myFTLE(n) = quants.FTLE;
+        myHyp(n) = quants.Hyp;
         
         % classes
         myMeh(n) = classes;
@@ -159,6 +161,8 @@ parfor m = 1:Npoints
     Compr(m,:) = myCompr(:);
     NonNml(m,:) = myNonNml(:);
     FTLE(m,:) = myFTLE(:);
+    Hyp(m,:) = myHyp(:);
+    
     NonDefect(m,:) = myNonDefect(:);
     TrCof(m,:) = myTrCof(:);
     
@@ -169,11 +173,18 @@ pause(0.5);
 
 retval.Dets = Dets;
 retval.Traces = Traces;
+if Ndim == 3
+    retval.TrCof = TrCof;
+end
+
 retval.Meh = Meh;
+
 retval.Compr = Compr;
 retval.NonNml = NonNml;
 retval.FTLE = FTLE;
+retval.Hyp = Hyp;
 retval.NonDefect = NonDefect;
+
 retval.ics = ics;
 retval.T  = T;
 retval.t0 = t0;
@@ -184,9 +195,6 @@ retval.order = order;
 retval.f = f;
 retval.tol = tol;
 
-if Ndim == 3
-    retval.TrCof = TrCof;
-end
 
 save(filename, '-struct','retval')
 fprintf(1, '%s : Saved classification data. All done.\n',filename);
