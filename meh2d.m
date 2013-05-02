@@ -1,4 +1,4 @@
-function [classes, compr, spectral] = meh2d( T, J )
+function [classes, quants, spectral] = meh2d( T, J )
 % meh2d( T, tol , ... )
 %
 % inputs:
@@ -20,92 +20,45 @@ cellfun( @(x)validateattributes(x, {'numeric'}, {}), J)
 
 % inputs are Jacobian matrices
 [Cp, Mp] = matpolys(J); % extract characteristic and minimal polynomials
-% extract determinant and sum of minors
+
+% 3d polynomial
+% P = x^2 - x Trace + Det
+
 if iscell(Cp)
-    %        tf = cellfun( @(x)(-x(2)), P );
-    tf = cellfun( @(x)(-x(2)), Cp );
-    df = cellfun( @(x)(x(3)), Cp );
+    Traces = cellfun( @(x)(-x(2)), Cp );
+    Dets = cellfun( @(x)(x(3)), Cp );
 else
-    tf = -Cp(:,2);
-    df = Cp(:,3);
+    Traces = -Cp(:,2);
+    Dets = Cp(:,3);
 end
 
 if ~iscell(Mp)
     Mp = mat2cell(Mp, ones(1,size(Mp,1)), size(Mp,2));
 end
 
+%% Compute quantifiers
+quants.Hyp = T^2 * (Dets - 4) .* Dets; % mesohyperbolic when positive
 
-spectral.defect = matdefect(Mp);
+% non-normality: Frobenius norm of the commutator of Jacobian
+quants.NonNml = cellfun( @(A)norm( ctranspose(A)*A - A*ctranspose(A), 'fro' ), J  );
 
+% defect: smallest distance between roots of the minimal polynomial
+quants.Defect = cellfun( @(p) mindist( roots(p) ), Mp ); % mindist.m distributed with package
 
-% normalcy
-nml = normalcy( J );
-
-validateattributes( df, {'numeric'},{'real','finite'});
-validateattributes( tf, {'numeric'},{'real','finite'});
-
-assert( all( size(df) == size(tf) ), 'df and tf should have the same sizes');
-
+% compressibility
+quants.Compr = T * Dets + Traces;
 
 %% computation of mesohyperbolicity
+classes_ind.hyp = quants.Hyp > 0;
 
-% incompressibility deviation = "compressibility"
+classes_ind.mh_flipping = (Dets > 4/(T^2)) & classes_ind.hyp;
+classes_ind.mh_pure = (Dets < 0) & classes_ind.hyp;
 
-compr = tf + df * T;
-mh_flipping = df < 0;
-mh_pure = df > 4/(T^2);
-not_mh = ~( mh_flipping | mh_pure );
+% assign pseudocolors
+classes = nan(size(Dets));
+classes(classes_ind.mh_flipping) = 1;
+classes(classes_ind.mh_pure) = -1;
+classes(~classes_ind.hyp) = 0;
 
-classes = nan(size(df));
-classes(mh_flipping) = -1;
-classes(mh_pure) = 1;
-classes(not_mh) = 0;
-
-spectral.dets = df;
-spectral.traces = tf;
-spectral.nml = nml;
-
-function retval = matdefect( Mp )
-% Computes how close a matrix is to being defective.
-% Matrix is defective only if its minimal polynomial has distinct roots.
-% This function computes minimal distance between roots of the minimal
-% polynomial, scaled with the maximum root.
-%
-% Mp is a cell array minimal polynomials
-
-validateattributes(Mp, {'cell'},{})
-
-retval = zeros(size(Mp));
-for k = 1:numel(Mp)
-    myroots = roots(Mp{k});
-    maxroot = max(abs(myroots));
-    if maxroot == 0
-        retval(k) = 0;
-    else
-        retval(k) = rootmindist( myroots )/maxroot;
-    end
-end
-
-function d = rootmindist(v)
-
-if ~iscolumn(v)
-    v = v.';
-end
-
-% repeat vector to the matrix
-V = repmat( v, [1, numel(v)]);
-
-% pairwise distance between elements
-D = abs(V - V.');
-
-% minimal off-diagonal distance (diagonal is obviously zero)
-d =min( D( eye(numel(v)) ~= 1 ) );
-
-
-function retval = normalcy( M )
-
-retval = zeros(size(M));
-for k = 1:numel(M)
-    retval(k) = norm( M{k}*ctranspose(M{k}) -  ctranspose(M{k}) * M{k} );
-end
-
+spectral.Dets = Dets;
+spectral.Traces = Traces;
