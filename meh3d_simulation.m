@@ -1,4 +1,4 @@
-function retval = meh3d_simulation(f, t0, T, method, ics, h, dp, order, name)
+function retval = meh3d_simulation(f, t0, T, method, ics, h, dp, order, tol,  name)
 % meh3d_simulation(f, t0, T, method, N, h, dp, order, name)
 %
 % Compute mesohyperbolicity for the vector field f. (2d on [-0.5,0.5]^2
@@ -22,6 +22,7 @@ function retval = meh3d_simulation(f, t0, T, method, ics, h, dp, order, name)
 
 validateattributes(f, {'function_handle'},{})
 validateattributes(name, {'char'},{})
+validateattributes(tol, {'numeric'},{'positive'})
 
 fprintf(1, 'Running vector field %s.\n', func2str(f));
 
@@ -37,9 +38,15 @@ end
 fprintf(1,'h = %.2e\n', h);
 
 %% computation
-validateattributes(ics, {'numeric'}, {'ncols',3})
+try
+    validateattributes(ics, {'numeric'}, {'ncols',3})
+    Ndim = 3;
+catch
+    validateattributes(ics, {'numeric'}, {'ncols',2})
+    Ndim = 2;
+end
+    
 Npoints = size(ics,1);
-Ndim = size(ics,2);
 
 filename = sprintf('system%s_%s_T_%.1f_N_%05d.mat',name,method, max(T), Npoints);
 
@@ -83,46 +90,59 @@ else
         
     end
     
-    fprintf(1, '%s : Jacobians computed in %.2f sec. Started classification.', filename, toc(t1));
+    fprintf(1, '%s : Jacobians computed in %.2f sec.\n', filename, toc(t1));
     pause(0.5);
     
 end
+
+retval.Jacobians = Jacobians;
+save(filename, '-struct','retval')
+fprintf(1, '%s : Saved Jacobian data. Starting classification\n',filename);
 
 Dets = zeros([Npoints, length(T)]);
 Traces = zeros(size(Dets));
 Meh = zeros(size(Dets));
 Compr = zeros(size(Dets));
-Nml = zeros(size(Dets));
+NonNml = zeros(size(Dets));
 Defect = zeros( size(Dets));
 TrCof = zeros(size(Dets));
 
+
+if Ndim == 3
+    disp('Using 3d mesohyperbolicity')
+    meh = @(T, J)meh3d( T, {J}, tol);
+else
+    disp('Using 2d mesohyperbolicity')    
+    meh = @(T,J)meh2d(T,{J});
+end
+
 % evaluate quantifiers for Jacobians
-parfor k = 1:Npoints
+parfor m = 1:Npoints
     
     myDets = zeros(1,length(T));
     myTraces = zeros(size(myDets));
     myMeh = zeros(size(myDets));
     myCompr = zeros(size(myDets));
-    myNml = zeros(size(myDets));
+    myNonNml = zeros(size(myDets));
     myDefect = zeros(size(myDets));
     
     myTrCof = zeros(size(myDets));
-    
+    myJacobians = Jacobians{m};
     
     for n = 1:length(T)
         
-        [classes, quants, spectral] = meh3d( T(n), {Jacobians{k}(:,:,n)}, 1e-3 );
+        [classes, quants, spectral] = meh( T(n), myJacobians(:,:,n) );
         
         % spectral
         myDets(n) = spectral.Dets;
         myTraces(n) = spectral.Traces;
-        if Ndim == 3
+        if isfield(spectral,'TrCofs') 
             myTrCof(n) = spectral.TrCofs;
         end
         
         % quants
         myCompr(n) = quants.Compr;
-        myNml(n) = quants.Nml;
+        myNonNml(n) = quants.NonNml;
         myDefect(n) = quants.Defect;
         
         % classes
@@ -130,26 +150,24 @@ parfor k = 1:Npoints
         
     end
     
-    Dets(k,:) = myDets(:);
-    Traces(k,:) = myTraces(:);
-    Meh(k,:) = myMeh(:);
-    Compr(k,:) = myCompr(:);
-    Nml(k,:) = myNml(:);
-    Defect(k,:) = myDefect(:);
-    TrCof(k,:) = myTrCof(:);
-    
+    Dets(m,:) = myDets(:);
+    Traces(m,:) = myTraces(:);
+    Meh(m,:) = myMeh(:);
+    Compr(m,:) = myCompr(:);
+    NonNml(m,:) = myNonNml(:);
+    Defect(m,:) = myDefect(:);
+    TrCof(m,:) = myTrCof(:);
     
 end
-fprintf(1, '%s : done in %.2f sec.', filename, toc(t1));
+fprintf(1, '%s : done in %.2f sec.\n', filename, toc(t1));
 pause(0.5);
 
-retval.Jacobians = Jacobians;
 
 retval.Dets = Dets;
 retval.Traces = Traces;
 retval.Meh = Meh;
 retval.Compr = Compr;
-retval.Nml = Nml;
+retval.NonNml = NonNml;
 retval.Defect = Defect;
 retval.ics = ics;
 retval.T  = T;
@@ -159,10 +177,12 @@ retval.dp = dp;
 retval.method = method;
 retval.order = order;
 retval.f = f;
+retval.tol = tol;
 
 if Ndim == 3
     retval.TrCof = TrCof;
 end
 
 save(filename, '-struct','retval')
+fprintf(1, '%s : Saved classification data. All done.\n',filename);
 
