@@ -47,7 +47,7 @@ quants.Hyp = T^2 * (Dets - 4) .* Dets; % mesohyperbolic when positive
 quants.NonNml = cellfun( @(A)norm( ctranspose(A)*A - A*ctranspose(A), 'fro' ), J  );
 
 % defect: smallest distance between roots of the minimal polynomial
-quants.Defect = cellfun( @(p) mindist( roots(p) ), Mp ); % mindist.m distributed with package
+quants.NonDefect = cellfun( @(p) mindist( roots(p) ), Mp ); % mindist.m distributed with package
 
 % compressibility
 quants.Compr = T * Dets + Traces;

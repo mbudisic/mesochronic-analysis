@@ -104,7 +104,7 @@ Traces = zeros(size(Dets));
 Meh = zeros(size(Dets));
 Compr = zeros(size(Dets));
 NonNml = zeros(size(Dets));
-Defect = zeros( size(Dets));
+NonDefect = zeros( size(Dets));
 TrCof = zeros(size(Dets));
 FTLE = zeros( size(Dets));
 
@@ -125,7 +125,7 @@ parfor m = 1:Npoints
     myMeh = zeros(size(myDets));
     myCompr = zeros(size(myDets));
     myNonNml = zeros(size(myDets));
-    myDefect = zeros(size(myDets));
+    myNonDefect = zeros(size(myDets));
     myFTLE = zeros(size(myDets));
     
     myTrCof = zeros(size(myDets));
@@ -145,7 +145,7 @@ parfor m = 1:Npoints
         % quants
         myCompr(n) = quants.Compr;
         myNonNml(n) = quants.NonNml;
-        myDefect(n) = quants.Defect;
+        myNonDefect(n) = quants.NonDefect;
         myFTLE(n) = quants.FTLE;
         
         % classes
@@ -159,7 +159,7 @@ parfor m = 1:Npoints
     Compr(m,:) = myCompr(:);
     NonNml(m,:) = myNonNml(:);
     FTLE(m,:) = myFTLE(:);
-    Defect(m,:) = myDefect(:);
+    NonDefect(m,:) = myNonDefect(:);
     TrCof(m,:) = myTrCof(:);
     
 end
@@ -173,7 +173,7 @@ retval.Meh = Meh;
 retval.Compr = Compr;
 retval.NonNml = NonNml;
 retval.FTLE = FTLE;
-retval.Defect = Defect;
+retval.NonDefect = NonDefect;
 retval.ics = ics;
 retval.T  = T;
 retval.t0 = t0;
