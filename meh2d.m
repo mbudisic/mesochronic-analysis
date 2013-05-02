@@ -37,6 +37,10 @@ if ~iscell(Mp)
 end
 
 %% Compute quantifiers
+
+% Finite-Time Lyapunov Exponents
+quants.FTLE = cellfun(  @(M)ftle(T,M), J );
+
 quants.Hyp = T^2 * (Dets - 4) .* Dets; % mesohyperbolic when positive
 
 % non-normality: Frobenius norm of the commutator of Jacobian
@@ -47,6 +51,7 @@ quants.Defect = cellfun( @(p) mindist( roots(p) ), Mp ); % mindist.m distributed
 
 % compressibility
 quants.Compr = T * Dets + Traces;
+
 
 %% computation of mesohyperbolicity
 classes_ind.hyp = quants.Hyp > 0;
