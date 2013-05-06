@@ -1,21 +1,22 @@
-** Mesochronic Analysis Toolbox **
-written by Marko Budisic, Dept. of Mechanical Engineering
-mbudisic@engr.ucsb.edu
-supported by ONR MURI N00014-11-1-0087
+** Mesochronic Analysis Toolbox ** written by Marko Budisic, Dept. of
+Mechanical Engineering mbudisic@engr.ucsb.edu supported by ONR MURI
+N00014-11-1-0087
 
 
 ** Intro **
 
-This is a Matlab toolbox intented to demonstrate the principles behind 2d and 3d mesochronic analyses for incompressible dynamical systems.
+This is a Matlab toolbox intented to demonstrate the principles behind
+2d and 3d mesochronic analyses for incompressible dynamical systems.
 
-Demo:
-abcslice.m
+Demo: abcslice.m
 
-For a simple demonstration, in Matlab run
-abcslice([], [0.5, 1.0, 1.5], 50, 1e-3)
+For a simple demonstration, in Matlab run abcslice([], [0.5, 1.0,
+1.5], 50, 1e-3)
 
-This code will perform the mesochronic analysis of a slice in the ABC flow,
-with 50x50 initial condition grid, over averaging intervals [0.5, 1.0, 1.5], with tolerance of 1e-3 on criteria that have to be matched to zero.
+This code will perform the mesochronic analysis of a slice in the ABC
+flow, with 50x50 initial condition grid, over averaging intervals
+[0.5, 1.0, 1.5], with tolerance of 1e-3 on criteria that have to be
+matched to zero.
 
 The results will be saved to a .mat file and also plotted.
 
@@ -23,43 +24,84 @@ The results will be saved to a .mat file and also plotted.
 
 * Main files *
 
-  abcslice.m			-- Demo; Can be used as a model for how analysis		
-  						   should be performed and visualized
-  meh_simulation.m      -- Harness: this is the main file that performs simulation and analysis of  an arbitrary system
-  meh2d.m               -- Takes a mesochronic Jacobian and computes quantifiers and classification for 2d flows
-  meh3d.m				-- Takes a mesochronic Jacobian and computes quantifiers and classification for 3d flows
+  abcslice.m -- Demo; Can be used as a model for how analysis should
+  						   be performed and visualized
+
+  meh_simulation.m -- Harness: this is the main file that performs
+  simulation and analysis of an arbitrary system
+
+  meh2d.m -- Takes a mesochronic Jacobian and computes quantifiers and
+  classification for 2d flows
+
+  meh3d.m -- Takes a mesochronic Jacobian and computes quantifiers and
+  classification for 3d flows
 
 * Computational aides *
 
-  evaluateJ_ode.m       -- Evaluates the mesochronic Jacobian at a given state point and time of a flow.
-  mcjacobian.m			-- Computes a mesochronic Jacobian from evaluations of instantaneous Jacobian 
-  						   along trajectory (run by evaluateJ_ode.m)
-  ftle.m				-- Computes FTLE from mesochronic Jacobian (run by meh2d/meh3d).
-  jacobian_fd.m			-- Computes instantaneous Jacobiaian using central difference method on a vector field.
-  matpolys.m			-- Computes characteristic and minimal polynomials of a matrix.
-  mindist.m				-- Computes the smallest difference of elements of a vector.
+  evaluateJ_ode.m -- Evaluates the mesochronic Jacobian at a given
+  state point and time of a flow.
 
-* Visualization aides * 
+  mcjacobian.m -- Computes a mesochronic Jacobian from evaluations of
+  						   instantaneous Jacobian along trajectory
+  						   (run by evaluateJ_ode.m)
 
-  mehcolor.m		  	-- Creates a colormap for visualization of 2d mesochronic classes using values of determinant.
-  diverging_map.m	  	-- Creates a diverging colormap between 2 colors. Written by Andy Stein 
-  						   based on Kenneth Moreland (Sandia) paper: 
-						   http://www.sandia.gov/~kmorel/documents/ColorMaps/ 
-						   doi:10.1007/978-3-642-10520-3_9 
+  ftle.m -- Computes FTLE from mesochronic Jacobian (run by
+  meh2d/meh3d).
+
+  jacobian_fd.m -- Computes instantaneous Jacobiaian using central
+  difference method on a vector field.
+
+  matpolys.m -- Computes characteristic and minimal polynomials of a
+  matrix.
+
+  mindist.m -- Computes the smallest difference of elements of a
+  vector.
+
+
+* Visualization aides *
+
+  mehcolor.m -- Creates a colormap for visualization of 2d mesochronic
+  classes using values of determinant.
+
+  diverging_map.m -- Creates a diverging colormap between 2
+  				  	 colors. Written by Andy Stein based on
+  					 Kenneth Moreland (Sandia) paper:
+  					 http://www.sandia.gov/~kmorel/documents/ColorMaps/
+  					 doi:10.1007/978-3-642-10520-3_9
 
 * Additional files *
 
-  abcflow_invsets_zslice.mat  -- dataset containing invariant sets of ABC flow. Used here for purposes of abcslice.m demo.
-  mcjacobian.prj			  -- Matlab Coder Project file, used to compile mcjacobian.m into a fast compiled code.
+  abcflow_invsets_zslice.mat -- dataset containing invariant sets of
+  ABC flow. Used here for purposes of abcslice.m demo.
+
+  mcjacobian.prj -- Matlab Coder Project file, used to compile
+  				    mcjacobian.m into a fast compiled code.
 
 
-Copyright (c) 2013, Regents of the University of California
-All rights reserved.
+Copyright (c) 2013, Regents of the University of California All rights
+reserved.
 
-Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
 
-Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
-Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
-Neither the name of the University of California, Santa Barbara nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+Redistributions of source code must retain the above copyright notice,
+this list of conditions and the following disclaimer.  Redistributions
+in binary form must reproduce the above copyright notice, this list of
+conditions and the following disclaimer in the documentation and/or
+other materials provided with the distribution.  Neither the name of
+the University of California, Santa Barbara nor the names of its
+contributors may be used to endorse or promote products derived from
+this software without specific prior written permission.  THIS
+SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
