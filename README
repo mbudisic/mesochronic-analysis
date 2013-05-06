@@ -1,6 +1,11 @@
-** Mesochronic Analysis Toolbox ** written by Marko Budisic, Dept. of
-Mechanical Engineering mbudisic@engr.ucsb.edu supported by ONR MURI
-N00014-11-1-0087
+** Mesochronic Analysis Toolbox ** 
+
+written by Marko Budisic, Dept. of
+Mechanical Engineering 
+
+mbudisic@engr.ucsb.edu 
+
+supported by ONR MURI N00014-11-1-0087
 
 
 ** Intro **
@@ -25,7 +30,7 @@ The results will be saved to a .mat file and also plotted.
 * Main files *
 
   abcslice.m -- Demo; Can be used as a model for how analysis should
-  						   be performed and visualized
+  			    be performed and visualized
 
   meh_simulation.m -- Harness: this is the main file that performs
   simulation and analysis of an arbitrary system
@@ -42,8 +47,8 @@ The results will be saved to a .mat file and also plotted.
   state point and time of a flow.
 
   mcjacobian.m -- Computes a mesochronic Jacobian from evaluations of
-  						   instantaneous Jacobian along trajectory
-  						   (run by evaluateJ_ode.m)
+  			      instantaneous Jacobian along trajectory
+  				  (run by evaluateJ_ode.m)
 
   ftle.m -- Computes FTLE from mesochronic Jacobian (run by
   meh2d/meh3d).
@@ -64,8 +69,8 @@ The results will be saved to a .mat file and also plotted.
   classes using values of determinant.
 
   diverging_map.m -- Creates a diverging colormap between 2
-  				  	 colors. Written by Andy Stein based on
-  					 Kenneth Moreland (Sandia) paper:
+  					 colors. Written by Andy Stein based on Kenneth
+  					 Moreland (Sandia) paper:
   					 http://www.sandia.gov/~kmorel/documents/ColorMaps/
   					 doi:10.1007/978-3-642-10520-3_9
 
