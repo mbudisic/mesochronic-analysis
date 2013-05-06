@@ -1,7 +1,7 @@
 function [mJ, sol] = evaluateJ_ode( order, ic, f, t0, T, h, dp )
 % EVALUATEJ_ODE( order, ic, f, t0, T, h, dp )
 %
-% Evaluate mesochronic Jacobian using direct method.
+% Evaluate mesochronic Jacobian using ODE evolution.
 %
 % order - order of the method used
 % ic - a single initial condition (column vector)
