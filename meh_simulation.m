@@ -74,6 +74,9 @@ else
     
     Jacobians = cell(Npoints,1);
     
+    if matlabpool('size') < 2
+        warning('Matlab running in serial mode. On multicore computers you can reduce computation time by opening parallel matlab jobs, e.g., run "matlabpool open"')
+    end
     % first just compute Jacobians
     disp([filename ': Started Jacobian computation.']); pause(0.5);
     
