@@ -39,5 +39,18 @@ Ji = jacobian_fd(f, tout, yout, dp);
 retstep = fix(T/h);
 
 % solve the Jacobian equation
-mJ = mcjacobian_mex(h, Ji, retstep, order);
+if exist('mcjacobian_mex') ~= 3 && exist('deploytool') == 2
+    mypath = mfilename('fullpath');
+    mypath = mypath(1:find('/' == mypath, 1, 'last'));
+    mcpath = [mypath 'mcjacobian.prj'];
+    warning('mcjacobian can be compiled into MEX file. Attempting to build mcjacobian.prj');
+    eval(['deploytool -build ' mcpath]);
+    error('deploying completed. re-run');
+end
 
+try
+    mJ = mcjacobian_mex(h, Ji, retstep, order);
+catch
+    warning(['Runnin slow, non-compiled mcjacobian. mcjacobian.prj did not build on its own. It can be compiled by going to ' mypath])
+    mJ = mcjacobian(h, Ji, retstep, order);
+end
