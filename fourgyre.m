@@ -73,25 +73,18 @@ if nargout == 0
     %    reshape( V, [N,N] )
     % to make it into a NxN matrix corresponding to NxN grid of initial
     % conditions, suitable for plotting
-    
-    % get edges of invariant sets
-    filename = 'abcflow_invsets_zslice.mat';
-    try
-        invedges = getinvedges(N, filename); % get edges of invariant structures
-    catch
-        disp(['Error retrieving edges of invariant sets from ' filename])
-        invedges = [];
-    end
-    
+    invedges = [];
     % -- plotting different quantities --
     tstampline = sprintf(' for T = %.1f', T);
     % Mesochronic Classes
     n = 1;
     figure(n)
-    pcolor(X,Y, reshape( mydata.Meh(:,ind), [N,N]));
+    pcolor(X,Y, reshape( mydata.Dets(:,ind), [N,N]));
     setaxes
-    cm = [1 0 0; 1 0.5 0; 0 1 0; 0 0.5 1; 0 0 1 ]; colormap(cm);
-    title(['Mesochronic classes with boundaries of vortices overlaid (black)' tstampline])
+    [cm, crange] = mehcolor(T, 64);
+    
+    colormap(cm); caxis([-crange, crange]);
+    title(['Mesochronic classes' tstampline])
     
     set(gca, 'Color', 'black');
     if ~isempty(invedges)
@@ -99,20 +92,21 @@ if nargout == 0
     end
     
     cb = findobj(gcf,'tag','Colorbar');
-    set(cb, 'YTick',-2:1:2)
-    set(cb, 'YTickLabel',{'EL-Focus', 'EL-Node','Non-hyp','FL-Node', 'FL-Focus'});
+    set(cb, 'YTick',[0, 4/(T^2)])
+    set(cb, 'YTickLabel',{'0.0', '4/T^2'});
+    set(cb, 'YTickLabel',{'0.0', sprintf('%.1f',4/T^2)});
     
     % Finite-Time Lyapunov Exponent
     if isfield(mydata,'FTLE')
         n = n+1; figure(n);
         pcolor(X,Y, reshape( mydata.FTLE(:,ind), [N,N]));
-        setaxes(mydata.FTLE)
+        setaxes
         set(gca, 'Color', 'green');
         if ~isempty(invedges)
         alpha(1-invedges)
         end
         
-        title(['FTLE with boundaries of vortices overlaid (green)' tstampline])
+        title(['FTLE' tstampline])
     else
         disp('No FTLE field (Finite-Time Lyapunov Exponent) available')
     end
@@ -147,18 +141,30 @@ if nargout == 0
         
         % State space coloring
         n = n+1; figure(n);
-        pcolor(X,Y, reshape( log10(mydata.Hyp(:,ind)), [N,N]));
-        setaxes(log10(mydata.Hyp))
+        
+        hypfield = sign(mydata.Hyp) .* log10( 1 + abs(mydata.Hyp) );
+        
+        
+        
+        pcolor(X,Y, reshape( hypfield(:,ind), [N,N]));
+        setaxes
+        cax = [-1,1]*max(abs(hypfield(:)));
+        caxis(cax);
+        sigmoid = @(nsteps)(1 - exp(-5*linspace(0,1,nsteps)));
+        vars = sigmoid(32);
+        vars = [-vars(end:-1:1).'; vars(:)];
+        vars = ( vars - min(vars) ) / (max(vars) - min(vars));
+
+        colormap(diverging_map(vars, [0,1,0], [1,0,0]))
         title(['Hyperbolicity' tstampline])
         
         % Histogram
         n = n+1; figure(n);
-        hist(log10(mydata.Hyp(:,ind)), ...
-            linspace(min(log10(mydata.Hyp(:))), ...
-                     max(log10(mydata.Hyp(:))),50)); % histogram with persistent bounds
+        boxes = linspace(min(hypfield(:)), max(hypfield(:)),50);
+        hist(hypfield(:,ind), boxes); % histogram with persistent bounds
         
         pct = [10,50,90];
-        pct_v = prctile(log10(mydata.Hyp(:,ind)),pct);
+        pct_v = prctile(hypfield(:,ind),pct);
         
         ax = axis;
         hold on;
@@ -208,7 +214,8 @@ xlabel('x [\pi]')
 ylabel('y [\pi]')
 
 if exist('fulldata','var')
-caxis( [min(fulldata(:)), max(fulldata(:))] );
+     disp('Normalizing axes')
+%     caxis( [min(fulldata(:)), max(fulldata(:))] );
 end
 
 function retval = ridge( M, pct, sgn )

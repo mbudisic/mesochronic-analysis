@@ -1,4 +1,4 @@
-function [retval, det_range] = mehcolor( det_range, ellimit, steps)
+function [retval, det_range] = mehcolor( T, steps)
 % MEHCOLOR
 %
 % [retval, det_range] = mehcolor( det_range, ellimit, steps)
@@ -15,10 +15,9 @@ blue = [0,0,1]*0.7;
     
 % ellimit is the upper bound of the mesoelliptic region
 % color range has to at least include this limit
-if det_range < ellimit
-    warning('det_range will be modified')
-    det_range = ellimit*1.5;
-end
+ellimit = 4/(T^2);
+det_range = ellimit*1.5;
+
 
 t = linspace(-det_range, det_range, steps);
 el_upper = find( t  < ellimit, 1, 'last');
