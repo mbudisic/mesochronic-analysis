@@ -19,15 +19,15 @@ function retval = fourgyre(mydata, T, N, tol)
 if  isempty(mydata)
     
     % determine the grid of inital conditions
-    icgrid = linspace(0,2*pi,N);
+    icgrid = linspace(0,1,N);
     [X,Y] = meshgrid( icgrid, icgrid);
     ics = [X(:), Y(:)];
     
     % specification of the system
     epsilon = 0.1;
     f = @(t,x)[...
-        -sin(x(1,:)) .* cos(x(2,:)) + 2*pi*epsilon*cos(2*pi*t) .* cos(x(1,:)) .* sin(x(2,:));...
-         cos(x(1,:)) .* sin(x(2,:)) - 2*pi*epsilon*cos(2*pi*t) .* sin(x(1,:)) .* cos(x(2,:)) ];
+        -sin(2*pi*x(1,:)) .* cos(2*pi*x(2,:)) + epsilon*cos(2*pi*t) .* cos(2*pi*x(1,:)) .* sin(2*pi*x(2,:));...
+         cos(2*pi*x(1,:)) .* sin(2*pi*x(2,:)) - epsilon*cos(2*pi*t) .* sin(2*pi*x(1,:)) .* cos(2*pi*x(2,:)) ];
     % run the simulation
     mydata = meh_simulation(f, 0, T, 'ode', ics, 1e-2, 1e-8, 2, tol, 'fourgyre');
     
@@ -42,7 +42,7 @@ if nargout == 0
     Nic = size(mydata.ics, 1);
     N = fix(sqrt(Nic));
     assert(N == sqrt(Nic), 'Number of initial conditions is not a square of an integer. This is unsuitable for demo plotting');
-    icgrid = linspace(0,2,N); % we use [0,2] grid for plotting only
+    icgrid = linspace(0,1,N); % we use [0,2] grid for plotting only
     [X,Y] = meshgrid( icgrid, icgrid);
     
     % use value T if present in data, otherwise use maximum available T
@@ -197,7 +197,7 @@ end
 %%
 function setaxes(fulldata)
 % Helper function for setting axes appropriately
-shading flat; axis([0,2, 0, 2]);
+shading flat; axis([0,1, 0, 1]);
 colorbar
 try
 colormap morgenstemning
@@ -205,8 +205,8 @@ catch
     disp('Download "morgenstemning" color scheme from MATLAB Central (google: colormap morgenstemning) for grayscale-compatible colors ;)');
     colormap hot
 end
-set(gca, 'XTick', (0:0.25:1)*2)
-set(gca, 'YTick', (0:0.25:1)*2)
+set(gca, 'XTick', (0:0.25:1))
+set(gca, 'YTick', (0:0.25:1))
 axis square
 xlabel('x [\pi]')
 ylabel('y [\pi]')
