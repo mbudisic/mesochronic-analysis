@@ -24,12 +24,10 @@ if  isempty(mydata)
     ics = [X(:), Y(:)];
     
     % specification of the system
-    u = @(x,y)[ -sin(x).*cos(y); cos(x) .* sin(y) ];
-    up = @(x,y)[ cos(x).*sin(y); -sin(x).*cos(y) ];
-
     epsilon = 0.1;
-    f = @(t,x)u(x(1,:), x(2,:)) + epsilon*cos(2*pi*t) .* up(x(1,:), x(2,:));
-    
+    f = @(t,x)[...
+        -sin(x(1,:)) .* cos(x(2,:)) + 2*pi*epsilon*cos(2*pi*t) .* cos(x(1,:)) .* sin(x(2,:));...
+         cos(x(1,:)) .* sin(x(2,:)) - 2*pi*epsilon*cos(2*pi*t) .* sin(x(1,:)) .* cos(x(2,:)) ];
     % run the simulation
     mydata = meh_simulation(f, 0, T, 'ode', ics, 1e-2, 1e-8, 2, tol, 'fourgyre');
     
@@ -94,7 +92,7 @@ if nargout == 0
     cb = findobj(gcf,'tag','Colorbar');
     set(cb, 'YTick',[0, 4/(T^2)])
     set(cb, 'YTickLabel',{'0.0', '4/T^2'});
-    set(cb, 'YTickLabel',{'0.0', sprintf('%.1f',4/T^2)});
+    %set(cb, 'YTickLabel',{'0.0', sprintf('%.f',4/T^2)});
     
     % Finite-Time Lyapunov Exponent
     if isfield(mydata,'FTLE')
