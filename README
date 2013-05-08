@@ -1,7 +1,7 @@
 ** Mesochronic Analysis Toolbox ** 
 
 written by Marko Budisic, Dept. of
-Mechanical Engineering 
+Mechanical Engineering, UC Santa Barbara
 
 mbudisic@engr.ucsb.edu 
 
@@ -15,8 +15,18 @@ This is a Matlab toolbox intented to demonstrate the principles behind
 
 Demo: abcslice.m
 
-For a simple demonstration, in Matlab run abcslice([], [0.5, 1.0,
-1.5], 50, 1e-3)
+For a simple (and relatively quick, cca 3 min to compute)
+demonstration, in Matlab run
+
+matlabpool open; % can be omitted on single-core computers
+abcslice([], 0.5, 50, 1e-3)
+
+For a more serious analysis, run
+
+abcslice([], [1, 10], 100, 1e-3)
+
+which may take hours, especially if no parallel functions are used.
+
 
 This code will perform the mesochronic analysis of a slice in the ABC
 flow, with 50x50 initial condition grid, over averaging intervals
