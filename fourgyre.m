@@ -98,7 +98,7 @@ if nargout == 0
     if isfield(mydata,'FTLE')
         n = n+1; figure(n);
         pcolor(X,Y, reshape( mydata.FTLE(:,ind), [N,N]));
-        setaxes
+        setaxes(mydata.FTLE(:,ind))
         set(gca, 'Color', 'green');
         if ~isempty(invedges)
         alpha(1-invedges)
@@ -113,7 +113,7 @@ if nargout == 0
     if isfield(mydata,'NonNml')
         n = n+1; figure(n);
         pcolor(X,Y, reshape( log10(mydata.NonNml(:,ind)), [N,N]));
-        setaxes(log10(mydata.NonNml))
+        setaxes(log10(mydata.NonNml(:,ind)))
         cb = findobj(gcf,'tag','Colorbar');title(cb,'log_{10}')
         title(['Non-normality' tstampline])
     else
@@ -124,7 +124,7 @@ if nargout == 0
     if isfield(mydata,'NonDefect')
         n = n+1; figure(n);
         pcolor(X,Y, reshape( log10(mydata.NonDefect(:,ind)), [N,N]));
-        setaxes(log10(mydata.NonDefect))
+        setaxes(log10(mydata.NonDefect(:,ind)))
         map = colormap;
         colormap( map(end:-1:1, :) );
         cb = findobj(gcf,'tag','Colorbar');title(cb,'log_{10}')
@@ -133,59 +133,13 @@ if nargout == 0
         disp('No NonDefect field (deviation from defective Jacobian) available')
     end
     
-    
-    % Hyperbolicity
-    if isfield(mydata,'Hyp')
         
-        % State space coloring
-        n = n+1; figure(n);
-        
-        hypfield = sign(mydata.Hyp) .* log10( 1 + abs(mydata.Hyp) );
-        
-        
-        
-        pcolor(X,Y, reshape( hypfield(:,ind), [N,N]));
-        setaxes
-        cax = [-1,1]*max(abs(hypfield(:)));
-        caxis(cax);
-        sigmoid = @(nsteps)(1 - exp(-5*linspace(0,1,nsteps)));
-        vars = sigmoid(32);
-        vars = [-vars(end:-1:1).'; vars(:)];
-        vars = ( vars - min(vars) ) / (max(vars) - min(vars));
-
-        colormap(diverging_map(vars, [0,1,0], [1,0,0]))
-        title(['Hyperbolicity' tstampline])
-        
-        % Histogram
-        n = n+1; figure(n);
-        boxes = linspace(min(hypfield(:)), max(hypfield(:)),50);
-        hist(hypfield(:,ind), boxes); % histogram with persistent bounds
-        
-        pct = [10,50,90];
-        pct_v = prctile(hypfield(:,ind),pct);
-        
-        ax = axis;
-        hold on;
-        for k = 1:length(pct)
-            set( line( [pct_v(k),pct_v(k)], ax(3:4)), 'color','red');
-            text( pct_v(k), ax(4) - 0.05*diff(ax(3:4)), sprintf('%d %%',pct(k)));
-        end
-        hold off;
-        title(['Distribution of hyperbolicity' tstampline])
-        xlabel('Hyperbolicity (log_{10})')
-        ylabel('Number of initial conditions')
-        set(gca, 'XTick', [ax(1), pct_v, ax(2)].')
-        set(gca, 'XTickLabel', num2str([ax(1), pct_v, ax(2)].','%.1f'))
-    else
-        disp('No Hyp field (hyperbolicity quantifier) available')
-    end
-    
     % Numerical Compressibility (quantifies error in computation of
     % Jacobian)
     if isfield(mydata,'Compr')
         n = n+1; figure(n);
         pcolor(X,Y, reshape( log10(abs(mydata.Compr(:,ind))), [N,N]));
-        setaxes(log10(abs(mydata.Compr)))
+        setaxes(log10(abs(mydata.Compr(:,ind))))
         cb = findobj(gcf,'tag','Colorbar');title(cb,'log_{10}')
         title(['Numerical compressibility' tstampline])
     else
@@ -195,7 +149,7 @@ if nargout == 0
 end
 
 %%
-function setaxes(fulldata)
+function retval = setaxes(fulldata)
 % Helper function for setting axes appropriately
 shading flat; axis([0,1, 0, 1]);
 colorbar
@@ -213,7 +167,8 @@ ylabel('y [\pi]')
 
 if exist('fulldata','var')
      disp('Normalizing axes')
-%     caxis( [min(fulldata(:)), max(fulldata(:))] );
+     caxis( prctile(fulldata(:), [1, 99]) );
+     retval = prctile(fulldata(:), [1, 99]);
 end
 
 function retval = ridge( M, pct, sgn )
