@@ -1,4 +1,4 @@
-function retval = meh_simulation(f, t0, T, method, ics, h, dp, order, tol,  name)
+function retval = meh_simulation(f, t0, T, direction, method, ics, h, dp, order, tol,  name)
 % meh_simulation(f, t0, T, method, N, h, dp, order, name)
 %
 % Compute mesohyperbolicity for the vector field f. (2d on [-0.5,0.5]^2
@@ -7,11 +7,16 @@ function retval = meh_simulation(f, t0, T, method, ics, h, dp, order, tol,  name
 % f - vector field
 % t0 - initial time
 % T - vector of periods of averaging
+% direction - direction of integration; positive for forward, negative for
+%             backward
 % mytype - 'ode' or 'fd' method of computation
 % ics - Npoints x 3 list of initial conditions
 % h - discretization of time
 % dp - finite difference variation
 % order - order of A-B method
+% tol - tolerance on evaluating zero-matching criteria (currently only for
+%       3d)
+% direction 
 % name (optional) - name of file to be saved to
 %
 % returns: structure saved to the file.
@@ -23,6 +28,7 @@ function retval = meh_simulation(f, t0, T, method, ics, h, dp, order, tol,  name
 validateattributes(f, {'function_handle'},{})
 validateattributes(name, {'char'},{})
 validateattributes(tol, {'numeric'},{'positive'})
+validateattributes(direction, {'numeric'}, {'scalar', 'real', 'nonzero'});
 
 fprintf(1, 'Running vector field %s.\n', func2str(f));
 
@@ -48,7 +54,13 @@ end
     
 Npoints = size(ics,1);
 
-filename = sprintf('system%s_%s_T_%.1f_N_%05d.mat',name,method, max(T), Npoints);
+if direction > 0
+    dirlabel = 'fwd';
+else
+    dirlabel = 'bwd';
+end
+
+filename = sprintf('mcan_%s_%s_%sT_%.1f_N_%05d.mat',name,method, dirlabel, max(T), Npoints);
 
 fileexists = exist(filename, 'file');
 
@@ -84,7 +96,7 @@ else
         ic = ics(k, :).';
         
         if strcmpi(method,'ode')
-            mJ = evaluateJ_ode( order, ic, f, t0, T, h, dp );
+            mJ = evaluateJ_ode( order, ic, f, t0, T, direction, h, dp );
         else
             mJ = evaluateJ_fd( ic, f, T, h, dp );
         end
@@ -197,7 +209,7 @@ retval.method = method;
 retval.order = order;
 retval.f = f;
 retval.tol = tol;
-
+retval.direction = direction;
 
 save(filename, '-struct','retval')
 fprintf(1, '%s : Saved classification data. All done.\n',filename);

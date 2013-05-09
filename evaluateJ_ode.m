@@ -1,4 +1,4 @@
-function [mJ, sol] = evaluateJ_ode( order, ic, f, t0, T, h, dp )
+function [mJ, sol] = evaluateJ_ode( order, ic, f, t0, T, direction, h, dp )
 % EVALUATEJ_ODE( order, ic, f, t0, T, h, dp )
 %
 % Evaluate mesochronic Jacobian using ODE evolution.
@@ -8,11 +8,14 @@ function [mJ, sol] = evaluateJ_ode( order, ic, f, t0, T, h, dp )
 % f - flow field (vectorized function handle)
 % t0 - initial time (scalar)
 % T - vector of integration lengths (positive)
+% direction (nonzero) - positive for forward in time, negative for backward
 % h - resampling time
 % dp - finite difference used for evaluation of the instantaneous Jacobian
 
 validateattributes(ic, {'numeric'}, {'column'})
 validateattributes(t0, {'numeric'}, {'scalar','real'})
+validateattributes(direction, {'numeric'}, {'scalar', 'real', 'nonzero'});
+
 T = sort(T);
 assert( min(diff([t0;T(:)])) > h, 'return steps should differ by more than integration step')
 assert( h <= min(T), 'time step should be smaller than integration length' )
@@ -20,7 +23,7 @@ assert( dp < 1, 'dp should be small')
 
 Tmax = max(T);
 
-t = t0 + ( 0:h:Tmax );
+t = t0 + sign(direction)*( 0:h:Tmax );
 
 % simulate
 opts = odeset('vectorized','on','RelTol',1e-4,'AbsTol',1e-6);
