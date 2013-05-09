@@ -41,7 +41,7 @@ end
 % Finite-Time Lyapunov Exponents
 quants.FTLE = cellfun(  @(M)ftle(T,M), J );
 
-quants.Hyp = T^2 * (Dets - 4) .* Dets; % mesohyperbolic when positive
+quants.Hyp = (T^2 * Dets - 4) .* Dets; % mesohyperbolic when positive
 
 % non-normality: Frobenius norm of the commutator of Jacobian
 quants.NonNml = cellfun( @(A)norm( ctranspose(A)*A - A*ctranspose(A), 'fro' ), J  );
@@ -54,10 +54,10 @@ quants.Compr = T * Dets + Traces;
 
 
 %% computation of mesohyperbolicity
-classes_ind.hyp = quants.Hyp > 0;
+classes_ind.hyp = quants.Hyp >= 0;
 
-classes_ind.mh_flipping = (Dets > 4/(T^2)) & classes_ind.hyp;
-classes_ind.mh_pure = (Dets < 0) & classes_ind.hyp;
+classes_ind.mh_flipping = (Dets >= 4/(T^2)) & classes_ind.hyp;
+classes_ind.mh_pure = (Dets <= 0) & classes_ind.hyp;
 
 % assign pseudocolors
 classes = nan(size(Dets));
