@@ -1,4 +1,4 @@
-function retval = fourgyre(mydata, T, N, tol)
+function retval = fourgyre(mydata, T, N, direction)
 % retval = fourgyre(mydata, T, N, tol)
 %
 % A demo run for four gyre flow - simulation and visualization.
@@ -11,7 +11,7 @@ function retval = fourgyre(mydata, T, N, tol)
 %
 % T   - vector of integration times
 % N   - number of initial points per axis (total simulated is N^2)
-% tol - tolerance in determining mesohyperbolicity
+% direction - direction of time 
 %
 %
 
@@ -29,7 +29,7 @@ if  isempty(mydata)
         -sin(2*pi*x(1,:)) .* cos(2*pi*x(2,:)) + epsilon*cos(2*pi*t) .* cos(2*pi*x(1,:)) .* sin(2*pi*x(2,:));...
          cos(2*pi*x(1,:)) .* sin(2*pi*x(2,:)) - epsilon*cos(2*pi*t) .* sin(2*pi*x(1,:)) .* cos(2*pi*x(2,:)) ];
     % run the simulation
-    mydata = meh_simulation(f, 0, T, 'ode', ics, 1e-2, 1e-8, 2, tol, 'fourgyre');
+    mydata = meh_simulation(f, 0, T, direction, 'ode', ics, 1e-2, 1e-8, 2, 1e-3, 'fourgyre');
     
     %% PLOTTING
 end
