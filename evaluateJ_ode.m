@@ -24,11 +24,18 @@ assert( dp < 1, 'dp should be small')
 
 Tmax = max(T);
 
-t = t0 + sign(direction)*( 0:h:Tmax );
+t = t0 + ( 0:h:Tmax );
 
 % simulate
 opts = odeset('vectorized','on','RelTol',1e-4,'AbsTol',1e-6);
-[tout, yout] = ode23t(f, t, ic, opts);
+
+if direction < 0
+    fsim = @(t,x)(-f(-t,x));
+else
+    fsim = f;
+end
+
+[tout, yout] = ode23t(fsim, t, ic, opts);
 
 sol.t = tout;
 sol.x = yout;
@@ -37,7 +44,7 @@ assert( norm( t - tout.', Inf) < 1e-12, 'Output times do not match input times')
 
 
 % evaluate Jacobian using finite differences
-Ji = jacobian_fd(f, tout, yout, dp);
+Ji = jacobian_fd(fsim, tout, yout, dp);
 
 % return steps are multiples of resampling interval
 retstep = fix(T/h);
