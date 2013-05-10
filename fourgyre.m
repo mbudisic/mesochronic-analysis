@@ -1,4 +1,4 @@
-function retval = fourgyre(mydata, T, N)
+function retval = fourgyre(mydata, T, N, direction)
 % retval = fourgyre(mydata, T, N, tol)
 %
 % A demo run for four gyre flow - simulation and visualization.
