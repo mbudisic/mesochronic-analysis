@@ -1,4 +1,4 @@
-function retval = fourgyre(mydata, T, N, direction)
+function retval = fourgyre(mydata, T, N)
 % retval = fourgyre(mydata, T, N, tol)
 %
 % A demo run for four gyre flow - simulation and visualization.
@@ -73,7 +73,7 @@ if nargout == 0
     % conditions, suitable for plotting
     invedges = [];
     % -- plotting different quantities --
-    if direction > 0
+    if mydata.direction > 0
         dirlabel = 'fwd';
     else
         dirlabel = 'bwd';
