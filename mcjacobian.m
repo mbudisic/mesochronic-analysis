@@ -69,11 +69,10 @@ for n = 1:maxStep
     
     % Degrade order if we have not computed enough steps to use a higher order method.
     % This way, lower order methods automatically initialize higher ones.
-    eord = min( [n, order] ); % effective order
-    
+    eord = min( [n, order] ) % effective order
     
     % form multiplication coefficient
-    coeff = abrhs{eord}/ablhs(eord);
+    coeff = abrhs(eord, 1:eord)/ablhs(eord);
     
     % approximate right hand side of the evolution
     dJ = coeff(1) * dJ_dt(n-1, F(:,:,2), Ji, h);
@@ -123,29 +122,32 @@ end
 function [rhs, lhs] = adamsbashforth
 % Adams-Bashforth coefficients (Petzold, Ascher, Linear Multistep,
 %                               table 5.1)
-rhs = {};
-lhs = [];
 
-% order 1
-rhs{1} = [1];
-lhs(1) = 1;
+maxorder = 6;
 
-% order 2
-rhs{2} = [3, -1];
-lhs(2) = 2;
+rhs = nan(maxorder,maxorder);
+lhs = zeros(1,maxorder);
 
-% order 3
-rhs{3} = [23, -16, 5];
-lhs(3) = 12;
+order=1;
+rhs(order, 1:order) = 1;
+lhs(order) = 1;
 
-% order 4
-rhs{4} = [55, -59, 37, -9];
-lhs(4) = 24;
+order=2;
+rhs(order, 1:order) = [3, -1];
+lhs(order) = 2;
 
-% order 5
-rhs{5} = [1901, -2774, 2616, -1274, 251];
-lhs(5) = 720;
+order=3;
+rhs(order, 1:order) = [23, -16, 5];
+lhs(order) = 12;
 
-% order 6
-rhs{6} = [4277, -7923, 9982, -7298, 2877, -475];
-lhs(6) = 1440;
+order=4;
+rhs(order, 1:order) = [55, -59, 37, -9];
+lhs(order) = 24;
+
+order=5;
+rhs(order, 1:order) = [1901, -2774, 2616, -1274, 251];
+lhs(order) = 720;
+
+order=6;
+rhs(order, 1:order) = [4277, -7923, 9982, -7298, 2877, -475];
+lhs(order) = 1440;
