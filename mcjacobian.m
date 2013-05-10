@@ -21,8 +21,9 @@ if h <= 0
     error('Timestep has to be positive')
 end
 
-if isempty(find( order == [1,2], 1))
-    error('Order needs to be either 1 or 2')
+allowedorders = [1,2,3];
+if isempty(find( order == allowedorders, 1))
+    error(['Order needs to be one of ' mat2str(allowedorders)])
 end
 
 Jisize = size(Ji);
@@ -56,16 +57,24 @@ for n = 1:maxStep
     
     % move F a step further, dropping oldest record, and inserting empty to the
     % front
-        F = stepme1(F);
+        F = advancestep(F);
     
     % Degrade order if we have not computed enough steps to use a higher order method.
     % This way, lower order methods automatically initialize higher ones.
     effectiveorder = min( [n, order] );
     
     if effectiveorder == 1
-        F(:,:,1) = F(:,:,2) + h*dJ_dt(n-1, F(:,:,2), Ji, h);
+        F(:,:,1) = F(:,:,2) ...
+                    + h*dJ_dt(n-1, F(:,:,2), Ji, h);
     elseif effectiveorder == 2
-        F(:,:,1) = F(:,:,2) + (3*h/2) * dJ_dt(n-1,F(:,:,2), Ji, h) - (h/2) * dJ_dt(n-2, F(:,:,3), Ji, h);
+        F(:,:,1) = F(:,:,2) ...
+                    + (3*h/2) * dJ_dt(n-1,F(:,:,2), Ji, h) ...
+                    - (h/2) * dJ_dt(n-2, F(:,:,3), Ji, h);
+    elseif effectiveorder == 3
+        F(:,:,1) = F(:,:,2) ...
+                    + (23*h/12) * dJ_dt(n-1,F(:,:,2), Ji, h) ...
+                    - (4*h/3) * dJ_dt(n-2, F(:,:,3), Ji, h)...
+                    + (5*h/12) * dJ_dt(n-3, F(:,:,4), Ji, h);
     else
         error('Effective order reported as %d', effectiveorder)
     end
@@ -86,7 +95,7 @@ end
 
 
 
-function retval = stepme1(mf)
+function retval = advancestep(mf)
 % drop last layer of mf, and append a zero matrix to the first layer
 % [a,b,...,m, n] ---> [0, a, b, ..., m]
 
