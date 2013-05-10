@@ -10,7 +10,8 @@ function [retval_jacs, retval_steps] = mcjacobian(h, Ji, retstep, order)
 %       - 0 - first step
 %       - -1 - last step
 %       - 
-% order - order of integration, currently 1 or 2
+% order - order of integration, currently 1,2,3
+%       - if negative, highest allowed order is selected
 %
 % returns:
 %
@@ -22,8 +23,13 @@ if h <= 0
 end
 
 allowedorders = [1,2,3];
+
+if order < 0
+    order = max(allowedorders);
+end
+
 if isempty(find( order == allowedorders, 1))
-    error(['Order needs to be one of ' mat2str(allowedorders)])
+    error('Order needs to be negative or  1, 2, or 3')
 end
 
 Jisize = size(Ji);
