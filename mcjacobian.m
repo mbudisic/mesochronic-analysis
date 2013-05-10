@@ -72,16 +72,16 @@ for n = 1:maxStep
     eord = min( [n, order] ); % effective order
     
     % form multiplication coefficient
-    coeff = abrhs(eord, 1:eord)/ablhs(eord);
+    coeff = h * abrhs(eord, 1:eord)/ablhs(eord);
     
     % approximate right hand side of the evolution
-    dJ = coeff(1) * dJ_dt(n-1, F(:,:,2), Ji, h);
+    deltaJ = coeff(1) * dJ_dt(n-1, F(:,:,2), Ji, h);
     for bstep = 2:eord
-        dJ = dJ + coeff(bstep) * dJ_dt(n-bstep, F(:,:,1+bstep), Ji, h);
+        deltaJ = deltaJ + coeff(bstep) * dJ_dt(n-bstep, F(:,:,1+bstep), Ji, h);
     end
     
     % update jacobian
-    F(:,:,1) = F(:,:,2) + h*dJ;
+    F(:,:,1) = F(:,:,2) + deltaJ;
     
     % detect a saving step
     savestep = find(n == retstep, 1, 'first');
