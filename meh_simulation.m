@@ -16,7 +16,7 @@ function retval = meh_simulation(f, t0, T, direction, method, ics, h, dp, order,
 % order - order of A-B method
 % tol - tolerance on evaluating zero-matching criteria (currently only for
 %       3d)
-% direction 
+% direction
 % name (optional) - name of file to be saved to
 %
 % returns: structure saved to the file.
@@ -51,7 +51,7 @@ catch
     validateattributes(ics, {'numeric'}, {'ncols',2})
     Ndim = 2;
 end
-    
+
 Npoints = size(ics,1);
 
 if direction > 0
@@ -73,16 +73,26 @@ end
 
 t1 = tic;
 if isfield(retval, 'Jacobians') && isfield(retval,'ics')
+    
     if (size(retval.Jacobians{1}, 1) == Ndim) && all( ics(:) == retval.ics(:) )
         disp([filename ' has Jacobian data. Skipping computation']);
         Jacobians = retval.Jacobians;
-
     else
         error('Jacobian data does not match input data. Exiting');
     end
     
 else
     
+    retval.ics = ics;
+    retval.T  = T;
+    retval.t0 = t0;
+    retval.h = h;
+    retval.dp = dp;
+    retval.method = method;
+    retval.order = order;
+    retval.f = f;
+    retval.tol = tol;
+    retval.direction = direction;
     
     Jacobians = cell(Npoints,1);
     
@@ -108,9 +118,10 @@ else
     fprintf(1, '%s : Jacobians computed in %.2f sec.\n', filename, toc(t1));
     pause(0.5);
     
+    retval.Jacobians = Jacobians;
+
 end
 
-retval.Jacobians = Jacobians;
 save(filename, '-struct','retval')
 fprintf(1, '%s : Saved Jacobian data. Starting classification\n',filename);
 
@@ -128,7 +139,7 @@ if Ndim == 3
     disp('Using 3d mesohyperbolicity')
     meh = @(T, J)meh3d( T, {J}, tol);
 else
-    disp('Using 2d mesohyperbolicity')    
+    disp('Using 2d mesohyperbolicity')
     meh = @(T,J)meh2d(T,{J});
 end
 
@@ -154,7 +165,7 @@ parfor m = 1:Npoints
         % spectral
         myDets(n) = spectral.Dets;
         myTraces(n) = spectral.Traces;
-        if isfield(spectral,'TrCofs') 
+        if isfield(spectral,'TrCofs')
             myTrCof(n) = spectral.TrCofs;
         end
         
@@ -200,16 +211,6 @@ retval.FTLE = FTLE;
 retval.Hyp = Hyp;
 retval.NonDefect = NonDefect;
 
-retval.ics = ics;
-retval.T  = T;
-retval.t0 = t0;
-retval.h = h;
-retval.dp = dp;
-retval.method = method;
-retval.order = order;
-retval.f = f;
-retval.tol = tol;
-retval.direction = direction;
 
 save(filename, '-struct','retval')
 fprintf(1, '%s : Saved classification data. All done.\n',filename);
