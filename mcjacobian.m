@@ -69,7 +69,7 @@ for n = 1:maxStep
     
     % Degrade order if we have not computed enough steps to use a higher order method.
     % This way, lower order methods automatically initialize higher ones.
-    eord = min( [n, order] ) % effective order
+    eord = min( [n, order] ); % effective order
     
     % form multiplication coefficient
     coeff = abrhs(eord, 1:eord)/ablhs(eord);
