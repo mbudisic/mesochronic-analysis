@@ -73,12 +73,17 @@ if nargout == 0
     % conditions, suitable for plotting
     invedges = [];
     % -- plotting different quantities --
-    tstampline = sprintf(' for T = %.1f', T);
+    if direction > 0
+        dirlabel = 'fwd';
+    else
+        dirlabel = 'bwd';
+    end
+    tstampline = sprintf(' for T = %.1f (%s)', T, dirlabel);
     % Mesochronic Classes
     n = 1;
     figure(n)
     pcolor(X,Y, reshape( mydata.Dets(:,ind), [N,N]));
-    setaxes
+    setaxes;
     [cm, crange] = mehcolor(T, 64);
     
     colormap(cm); caxis([-crange, crange]);
@@ -98,7 +103,7 @@ if nargout == 0
     if isfield(mydata,'FTLE')
         n = n+1; figure(n);
         pcolor(X,Y, reshape( mydata.FTLE(:,ind), [N,N]));
-        setaxes(mydata.FTLE(:,ind))
+        setaxes(mydata.FTLE(:,ind));
         set(gca, 'Color', 'green');
         if ~isempty(invedges)
         alpha(1-invedges)
@@ -113,7 +118,7 @@ if nargout == 0
     if isfield(mydata,'NonNml')
         n = n+1; figure(n);
         pcolor(X,Y, reshape( log10(mydata.NonNml(:,ind)), [N,N]));
-        setaxes(log10(mydata.NonNml(:,ind)))
+        setaxes(log10(mydata.NonNml(:,ind)));
         cb = findobj(gcf,'tag','Colorbar');title(cb,'log_{10}')
         title(['Non-normality' tstampline])
     else
@@ -124,7 +129,7 @@ if nargout == 0
     if isfield(mydata,'NonDefect')
         n = n+1; figure(n);
         pcolor(X,Y, reshape( log10(mydata.NonDefect(:,ind)), [N,N]));
-        setaxes(log10(mydata.NonDefect(:,ind)))
+        setaxes(log10(mydata.NonDefect(:,ind)));
         map = colormap;
         colormap( map(end:-1:1, :) );
         cb = findobj(gcf,'tag','Colorbar');title(cb,'log_{10}')
@@ -139,7 +144,7 @@ if nargout == 0
     if isfield(mydata,'Compr')
         n = n+1; figure(n);
         pcolor(X,Y, reshape( log10(abs(mydata.Compr(:,ind))), [N,N]));
-        setaxes(log10(abs(mydata.Compr(:,ind))))
+        setaxes(log10(abs(mydata.Compr(:,ind))));
         cb = findobj(gcf,'tag','Colorbar');title(cb,'log_{10}')
         title(['Numerical compressibility' tstampline])
     else
