@@ -30,6 +30,8 @@ validateattributes(name, {'char'},{})
 validateattributes(tol, {'numeric'},{'positive'})
 validateattributes(direction, {'numeric'}, {'scalar', 'real', 'nonzero'});
 
+direction = sign(direction);
+
 fprintf(1, 'Running vector field %s\n in %+d direction.\n', func2str(f), direction);
 
 if strcmpi(method,'ode')
