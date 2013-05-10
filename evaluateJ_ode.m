@@ -15,6 +15,7 @@ function [mJ, sol] = evaluateJ_ode( order, ic, f, t0, T, direction, h, dp )
 validateattributes(ic, {'numeric'}, {'column'})
 validateattributes(t0, {'numeric'}, {'scalar','real'})
 validateattributes(direction, {'numeric'}, {'scalar', 'real', 'nonzero'});
+validateattributes(T, {'numeric'}, {'positive'});
 
 T = sort(T);
 assert( min(diff([t0;T(:)])) > h, 'return steps should differ by more than integration step')
@@ -46,9 +47,14 @@ if exist('mcjacobian_mex') ~= 3 && exist('deploytool') == 2
     mypath = mfilename('fullpath');
     mypath = mypath(1:find('/' == mypath, 1, 'last'));
     mcpath = [mypath 'mcjacobian.prj'];
+    worker = getCurrentTask();
+    if ~isempty(worker)
+        error('deploying cannot be done automatically in multithreaded mode. manually compile mcjacobian.prj or re-run command in a single thread mode')
+    else
     warning('mcjacobian can be compiled into MEX file. Attempting to build mcjacobian.prj');
     eval(['deploytool -build ' mcpath]);
     error('deploying completed. re-run');
+    end
 end
 
 try

@@ -105,7 +105,7 @@ else
         ic = ics(k, :).';
         
         if strcmpi(method,'ode')
-            mJ = evaluateJ_ode( order, ic, f, t0, T, direction, h, dp );
+            mJ = evaluateJ_ode( -1, ic, f, t0, T, direction, h, dp );
         else
             mJ = evaluateJ_fd( ic, f, T, h, dp );
         end
