@@ -9,7 +9,7 @@ function [retval_jacs, retval_steps] = mcjacobian(h, Ji, retstep, order)
 % steps - vector indices of returned steps, 0-started, mod(, Nsteps)
 %       - 0 - first step
 %       - -1 - last step
-%       - 
+%       -
 % order - order of integration, currently 1,2,3
 %       - if negative, highest allowed order is selected
 %
@@ -22,25 +22,26 @@ if h <= 0
     error('Timestep has to be positive')
 end
 
-allowedorders = 1:5;
+%% choose order of the method
+[abrhs, ablhs] = adamsbashforth;
 
 if order < 0
-    order = max(allowedorders);
+    order = length(ablhs);
+elseif order > length(ablhs)
+    error('Maximum available Adams-Bashforth order exceeded. Set to -1 for automatically setting to maximal order implemented')
 end
 
-if isempty(find( order == allowedorders, 1))
-    error('Order needs to be negative or  1, 2, or 3')
-end
-
+%% storage for intermediate results
 Jisize = size(Ji);
 Nt = Jisize(3);
 
 % storage for mesochronic jacobian steps; index 1 is current, index 2 is previous step, index 3 two steps ago etc.
-F = zeros( [Jisize(1:2), order+1] ); 
+F = zeros( [Jisize(1:2), order+1] );
 
 % zeroth step
 F(:,:,1) = Ji(:,:,1);
 
+%% determine which steps to return back to caller
 if isempty(retstep)
     retstep = -1;
 end
@@ -56,6 +57,7 @@ retlength = length(retstep);
 retval_steps = zeros(1, retlength);
 retval_jacs = zeros( Jisize(1), Jisize(2), retlength);
 
+%% main update loop
 maxStep = Nt-1;
 % step loop - zero indexed, 0 is the initial time (not computed)
 %             maxStep is the final time
@@ -63,45 +65,24 @@ for n = 1:maxStep
     
     % move F a step further, dropping oldest record, and inserting empty to the
     % front
-        F = advancestep(F);
+    F = shiftstep(F);
     
     % Degrade order if we have not computed enough steps to use a higher order method.
     % This way, lower order methods automatically initialize higher ones.
-    effectiveorder = min( [n, order] );
+    eord = min( [n, order] ); % effective order
     
-    if effectiveorder == 1
-        F(:,:,1) = F(:,:,2) + h*(...
-            + dJ_dt(n-1, F(:,:,2), Ji, h)...
-            );
-    elseif effectiveorder == 2
-        F(:,:,1) = F(:,:,2) + h*(...
-            + (3/2) * dJ_dt(n-1,F(:,:,2), Ji, h) ...
-            - (1/2) * dJ_dt(n-2, F(:,:,3), Ji, h)...
-            );
-    elseif effectiveorder == 3
-        F(:,:,1) = F(:,:,2) + h*(...
-            + (23/12) * dJ_dt(n-1,F(:,:,2), Ji, h) ...
-            - (4/3) * dJ_dt(n-2, F(:,:,3), Ji, h)...
-            + (5/12) * dJ_dt(n-3, F(:,:,4), Ji, h)...
-            );
-    elseif effectiveorder == 4
-        F(:,:,1) = F(:,:,2) + h*(...
-            + (55/24) * dJ_dt(n-1,F(:,:,2), Ji, h) ...
-            - (59/24) * dJ_dt(n-2, F(:,:,3), Ji, h)...
-            + (37/24) * dJ_dt(n-3, F(:,:,4), Ji, h)...
-            - (3/8) * dJ_dt(n-4, F(:,:,5), Ji, h)...
-            );
-    elseif effectiveorder == 5
-        F(:,:,1) = F(:,:,2) + h*(...
-            + (1901/720) * dJ_dt(n-1,F(:,:,2), Ji, h) ...
-            - (1387/360) * dJ_dt(n-2, F(:,:,3), Ji, h)...
-            + (109/30) * dJ_dt(n-3, F(:,:,4), Ji, h)...
-            - (637/360) * dJ_dt(n-4, F(:,:,5), Ji, h)...
-            + (251/720) * dJ_dt(n-5, F(:,:,6), Ji, h)...
-            );
-    else
-        error('Effective order reported as %d', effectiveorder)
+    
+    % form multiplication coefficient
+    coeff = abrhs{eord}/ablhs(eord);
+    
+    % approximate right hand side of the evolution
+    dJ = coeff(1) * dJ_dt(n-1, F(:,:,2), Ji, h);
+    for bstep = 2:eord
+        dJ = dJ + coeff(bstep) * dJ_dt(n-bstep, F(:,:,1+bstep), Ji, h);
     end
+    
+    % update jacobian
+    F(:,:,1) = F(:,:,2) + h*dJ;
     
     % detect a saving step
     savestep = find(n == retstep, 1, 'first');
@@ -118,14 +99,15 @@ for n = 1:maxStep
 end
 
 
+%% auxiliaries
 
-function retval = advancestep(mf)
+function retval = shiftstep(mf)
 % drop last layer of mf, and append a zero matrix to the first layer
 % [a,b,...,m, n] ---> [0, a, b, ..., m]
 
 retval = cat(3,...
-        zeros(size(mf,1),size(mf,2)),...
-        mf(:,:,1:end-1) );
+    zeros(size(mf,1),size(mf,2)),...
+    mf(:,:,1:end-1) );
 
 function retval = dJ_dt(k, F, Ji, h)
 % this is numerical derivative of the mesochronic jacobian
@@ -138,4 +120,32 @@ else
     error('k has to be non-negative')
 end
 
+function [rhs, lhs] = adamsbashforth
+% Adams-Bashforth coefficients (Petzold, Ascher, Linear Multistep,
+%                               table 5.1)
+rhs = {};
+lhs = [];
 
+% order 1
+rhs{1} = [1];
+lhs(1) = 1;
+
+% order 2
+rhs{2} = [3, -1];
+lhs(2) = 2;
+
+% order 3
+rhs{3} = [23, -16, 5];
+lhs(3) = 12;
+
+% order 4
+rhs{4} = [55, -59, 37, -9];
+lhs(4) = 24;
+
+% order 5
+rhs{5} = [1901, -2774, 2616, -1274, 251];
+lhs(5) = 720;
+
+% order 6
+rhs{6} = [4277, -7923, 9982, -7298, 2877, -475];
+lhs(6) = 1440;
