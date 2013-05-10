@@ -17,6 +17,10 @@ function [retval_jacs, retval_steps] = mcjacobian(h, Ji, retstep, order)
 % retval_jacs - mesochronic jacobians taken at requested steps
 % retval_steps - requested steps, corresponding to jacobians in retval_jacs
 
+if h <= 0
+    error('Timestep has to be positive')
+end
+
 if isempty(find( order == [1,2], 1))
     error('Order needs to be either 1 or 2')
 end
@@ -40,7 +44,6 @@ retstep = mod(retstep, Nt);
 retstep = unique(retstep);
 
 retlength = length(retstep);
-
 
 % storage for return values
 retval_steps = zeros(1, retlength);
