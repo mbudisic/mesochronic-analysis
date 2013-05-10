@@ -87,7 +87,9 @@ if nargout == 0
     [cm, crange] = mehcolor(T, 64);
     
     colormap(cm); caxis([-crange, crange]);
-    title(['Mesochronic classes' tstampline])
+    titleline = ['Mesochronic classes' tstampline];
+    title(titleline)
+    set(gcf,'name',titleline);
     
     set(gca, 'Color', 'black');
     if ~isempty(invedges)
@@ -109,7 +111,11 @@ if nargout == 0
         alpha(1-invedges)
         end
         
-        title(['FTLE' tstampline])
+        titleline =['FTLE' tstampline];
+    title(titleline)
+    set(gcf,'name',titleline);
+        
+        
     else
         disp('No FTLE field (Finite-Time Lyapunov Exponent) available')
     end
@@ -120,7 +126,10 @@ if nargout == 0
         pcolor(X,Y, reshape( log10(mydata.NonNml(:,ind)), [N,N]));
         setaxes(log10(mydata.NonNml(:,ind)));
         cb = findobj(gcf,'tag','Colorbar');title(cb,'log_{10}')
-        title(['Non-normality' tstampline])
+        titleline = ['Non-normality' tstampline];
+            title(titleline)
+    set(gcf,'name',titleline);
+
     else
         disp('No NonNml field (deviation from normal Jacobian) available')
     end
@@ -133,7 +142,10 @@ if nargout == 0
         map = colormap;
         colormap( map(end:-1:1, :) );
         cb = findobj(gcf,'tag','Colorbar');title(cb,'log_{10}')
-        title(['Non-defectiveness' tstampline])
+        titleline= ['Non-defectiveness' tstampline];
+            title(titleline)
+    set(gcf,'name',titleline);
+
     else
         disp('No NonDefect field (deviation from defective Jacobian) available')
     end
@@ -146,7 +158,10 @@ if nargout == 0
         pcolor(X,Y, reshape( log10(abs(mydata.Compr(:,ind))), [N,N]));
         setaxes(log10(abs(mydata.Compr(:,ind))));
         cb = findobj(gcf,'tag','Colorbar');title(cb,'log_{10}')
-        title(['Numerical compressibility' tstampline])
+        titleline=['Numerical compressibility' tstampline];
+    title(titleline)
+    set(gcf,'name',titleline);
+        
     else
         disp('No Compr field (numerical compressibility) available')
     end
