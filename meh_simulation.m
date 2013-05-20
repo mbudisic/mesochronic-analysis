@@ -1,32 +1,38 @@
-function retval = meh_simulation(f, t0, T, direction, method, ics, h, dp, order, tol,  name)
-% meh_simulation(f, t0, T, method, N, h, dp, order, name)
+function retval = meh_simulation(f, t0, T, direction, method, ics, h, dp, order, tol, filetag)
+% meh_simulation(f, t0, T, direction, method, ics, h, dp, order, tol,  name)
 %
-% Compute mesohyperbolicity for the vector field f. (2d on [-0.5,0.5]^2
-% grid for now)
+% Compute mesochronic analysis of a dynamical system given by 
+% the vector field f under assumption of incompressibility.
 %
-% f - vector field
+% f - vector field (function handle)
 % t0 - initial time
-% T - vector of periods of averaging
+% T - vector of *positive* integration periods
 % direction - direction of integration; positive for forward, negative for
 %             backward
-% mytype - 'ode' or 'fd' method of computation
+% method - method of evaluating mesochronic Jacobian
+%          'ode' (Adams-Bashforth evolution) or 'fd' (finite difference)
 % ics - Npoints x 3 list of initial conditions
 % h - discretization of time
-% dp - finite difference variation
-% order - order of A-B method
+% dp - finite difference variation (for instantaneous Jacobian evaluation)
+% order - order of Adams-Bashforth
+%         -1 for highest possible Adams-Bashforth method (currently 6), 
+%          1-6 for appropriate order of Adams-Bashforth
 % tol - tolerance on evaluating zero-matching criteria (currently only for
 %       3d)
-% direction
-% name (optional) - name of file to be saved to
+% filetag (optional) - tag of file to be saved to
 %
 % returns: structure saved to the file.
 %
-% Open matlabpool if parallel computation is desired.
-
-%warning('Computing only for 2d fields for now')
+% The output filename is generated from the filetag and basic
+% information about the initial conditions simulated.
+% If the filename of the output is found in the current directory
+% the code will attempt to load the Jacobian data from it,
+% therefore shortening the time required to re-analyze the system.
+%
+% Open matlabpool before running if parallel computation is desired.
 
 validateattributes(f, {'function_handle'},{})
-validateattributes(name, {'char'},{})
+validateattributes(filetag, {'char'},{})
 validateattributes(tol, {'numeric'},{'positive'})
 validateattributes(direction, {'numeric'}, {'scalar', 'real', 'nonzero'});
 
@@ -45,6 +51,8 @@ end
 fprintf(1,'h = %.2e\n', h);
 
 %% computation
+
+% determine dimension of the state space
 try
     validateattributes(ics, {'numeric'}, {'ncols',3})
     Ndim = 3;
@@ -61,7 +69,7 @@ else
     dirlabel = 'bwd';
 end
 
-filename = sprintf('mcan_%s_%s_%sT_%.1f_N_%05d.mat',name,method, dirlabel, max(T), Npoints);
+filename = sprintf('mcan_%s_%s_%sT_%.1f_N_%05d.mat',filetag,method, dirlabel, max(T), Npoints);
 
 fileexists = exist(filename, 'file');
 
@@ -73,6 +81,8 @@ else
 end
 
 t1 = tic;
+
+% Jacobian data is found in the current directory
 if isfield(retval, 'Jacobians') && isfield(retval,'ics')
     
     if (size(retval.Jacobians{1}, 1) == Ndim) && all( ics(:) == retval.ics(:) )
@@ -82,6 +92,7 @@ if isfield(retval, 'Jacobians') && isfield(retval,'ics')
         error('Jacobian data does not match input data. Exiting');
     end
     
+% no Jacobian data found - run the simulations    
 else
     
     retval.ics = ics;
@@ -103,11 +114,14 @@ else
     % first just compute Jacobians
     disp([filename ': Started Jacobian computation.']); pause(0.5);
     
+    orderlist = nan(1,Npoints);
+    
     parfor k = 1:Npoints
         ic = ics(k, :).';
         
         if strcmpi(method,'ode')
-            mJ = evaluateJ_ode( -1, ic, f, t0, T, direction, h, dp );
+            [mJ,~,myorder] = evaluateJ_ode( order, ic, f, t0, T, direction, h, dp );
+            orderlist(k) = myorder;
         else
             mJ = evaluateJ_fd( ic, f, T, h, dp );
         end
@@ -116,6 +130,8 @@ else
         
     end
     
+    % set the overall order to the lowest order used by computation
+    retval.order = min(orderlist);
     fprintf(1, '%s : Jacobians computed in %.2f sec.\n', filename, toc(t1));
     pause(0.5);
     
@@ -126,18 +142,20 @@ end
 save(filename, '-struct','retval')
 fprintf(1, '%s : Saved Jacobian data. Starting classification\n',filename);
 
+% set up output storage structures
 Dets = zeros([Npoints, length(T)]);
 Traces = zeros(size(Dets));
 Meh = zeros(size(Dets));
 Compr = zeros(size(Dets));
 NonNml = zeros(size(Dets));
 NonDefect = zeros( size(Dets));
-TrCof = zeros(size(Dets));
+TrCof = zeros(size(Dets)); % Trace of Cofactor - used for 3d analysis
 FTLE = zeros( size(Dets));
 Hyp =  zeros( size(Dets));
 
 if Ndim == 3
     disp('Using 3d mesohyperbolicity')
+    assert(exist('meh3d','file'), '3d analysis not yet implemented');
     meh = @(T, J)meh3d( T, {J}, tol);
 else
     disp('Using 2d mesohyperbolicity')
@@ -147,6 +165,7 @@ end
 % evaluate quantifiers for Jacobians
 parfor m = 1:Npoints
     
+    % temporary parallel job storage
     myDets = zeros(1,length(T));
     myTraces = zeros(size(myDets));
     myMeh = zeros(size(myDets));
@@ -159,29 +178,35 @@ parfor m = 1:Npoints
     myTrCof = zeros(size(myDets));
     myJacobians = Jacobians{m};
     
+    % for each integration period - this could likely be automatized
+    % within meh2d/meh3d functions
+    % The faculty within meh2d/3d already exists, but we have to make
+    % sure that it can handle a vector of Ts, appropriate slice
+    % Jacobians, etc.
     for n = 1:length(T)
         
         [classes, quants, spectral] = meh( T(n), myJacobians(:,:,n) );
         
-        % spectral
+        % spectral quantities
         myDets(n) = spectral.Dets;
         myTraces(n) = spectral.Traces;
         if isfield(spectral,'TrCofs')
             myTrCof(n) = spectral.TrCofs;
         end
         
-        % quants
+        % quantifiers of mesochronic analysis criteria
         myCompr(n) = quants.Compr;
         myNonNml(n) = quants.NonNml;
         myNonDefect(n) = quants.NonDefect;
         myFTLE(n) = quants.FTLE;
         myHyp(n) = quants.Hyp;
         
-        % classes
+        % mesochronic classes
         myMeh(n) = classes;
         
     end
     
+    % copy temporary to output storage
     Dets(m,:) = myDets(:);
     Traces(m,:) = myTraces(:);
     Meh(m,:) = myMeh(:);
@@ -197,7 +222,7 @@ end
 fprintf(1, '%s : done in %.2f sec.\n', filename, toc(t1));
 pause(0.5);
 
-
+% create and store output structures
 retval.Dets = Dets;
 retval.Traces = Traces;
 if Ndim == 3

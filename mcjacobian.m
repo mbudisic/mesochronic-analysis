@@ -1,4 +1,4 @@
-function [retval_jacs, retval_steps] = mcjacobian(h, Ji, retstep, order)
+function [retval_jacs, retval_steps, order] = mcjacobian(h, Ji, retstep, order)
 % MCJACOBIAN
 %
 % Compute the mesochronic Jacobian evolved over the span t.
@@ -10,7 +10,7 @@ function [retval_jacs, retval_steps] = mcjacobian(h, Ji, retstep, order)
 %       - 0 - first step
 %       - -1 - last step
 %       -
-% order - order of integration, currently 1,2,3
+% order - order of integration, currently 1-6
 %       - if negative, highest allowed order is selected
 %
 % returns:

@@ -1,4 +1,4 @@
-function [mJ, sol] = evaluateJ_ode( order, ic, f, t0, T, direction, h, dp )
+function [mJ, sol, order] = evaluateJ_ode( order, ic, f, t0, T, direction, h, dp )
 % EVALUATEJ_ODE( order, ic, f, t0, T, h, dp )
 %
 % Evaluate mesochronic Jacobian using ODE evolution.
@@ -65,8 +65,8 @@ if exist('mcjacobian_mex') ~= 3 && exist('deploytool') == 2
 end
 
 try
-    mJ = mcjacobian_mex(h, Ji, retstep, order);
+    [mJ, ~, order] = mcjacobian_mex(h, Ji, retstep, order);
 catch
     warning(['Runnin slow, non-compiled mcjacobian. mcjacobian.prj did not build on its own. It can be compiled by going to ' mypath])
-    mJ = mcjacobian(h, Ji, retstep, order);
+    [mJ, ~, order] = mcjacobian(h, Ji, retstep, order);
 end
