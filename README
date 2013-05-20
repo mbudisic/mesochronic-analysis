@@ -15,7 +15,7 @@ This is a Matlab toolbox intented to demonstrate the principles behind
 The code compiles itself correctly upon the first run in serial (non-parallel) Matlab. So this step can be skipped if code is always to be run in serial mode.
 
 To run in parallel, in the folder containing mcjacobian.prj first run:
-   deploytool -build mcjacobian.prj
+   deploytool -build mcjacobian.prj % wait until "Build finished." is output
 which will compile matlab code into C, improving the speed of computation.
 
 ** Test (demo) system **
@@ -30,22 +30,15 @@ b) replace the evaluations of Jacobian of the vector field along trajectory	poin
 
 Demo: fourgyre.m
 
+% open parallel jobs
 matlabpool open; % 
-abcslice([], 0.5, 50, 1e-3)
 
-For a more serious analysis, run
+% computes mesochronic analysis
+% and store results in mcan_fourgyre_ode_fwdT_1.5_N_00900.mat
+R = fourgyre([], [0.5, 1, 1.5], 30, 1) 
 
-abcslice([], [1, 10], 100, 1e-3)
-
-which may take hours, especially if no parallel functions are used.
-
-
-This code will perform the mesochronic analysis of a slice in the ABC
-flow, with 50x50 initial condition grid, over averaging intervals
-[0.5, 1.0, 1.5], with tolerance of 1e-3 on criteria that have to be
-matched to zero.
-
-The results will be saved to a .mat file and also plotted.
+% visualize output for T=1
+fourgyre(R, 1, 30, 1) 
 
 *** File functionality ***
 
@@ -60,9 +53,6 @@ The results will be saved to a .mat file and also plotted.
   meh2d.m -- Takes a mesochronic Jacobian and computes quantifiers and
   classification for 2d flows
 
-  meh3d.m -- Takes a mesochronic Jacobian and computes quantifiers and
-  classification for 3d flows
-
 * Computational aides *
 
   evaluateJ_ode.m -- Evaluates the mesochronic Jacobian at a given
@@ -73,7 +63,7 @@ The results will be saved to a .mat file and also plotted.
   				  (run by evaluateJ_ode.m)
 
   ftle.m -- Computes FTLE from mesochronic Jacobian (run by
-  meh2d/meh3d).
+  meh2d).
 
   jacobian_fd.m -- Computes instantaneous Jacobiaian using central
   difference method on a vector field.
@@ -98,12 +88,8 @@ The results will be saved to a .mat file and also plotted.
 
 * Additional files *
 
-  abcflow_invsets_zslice.mat -- dataset containing invariant sets of
-  ABC flow. Used here for purposes of abcslice.m demo.
-
   mcjacobian.prj -- Matlab Coder Project file, used to compile
   				    mcjacobian.m into a fast compiled code.
-
 
 Copyright (c) 2013, Regents of the University of California All rights
 reserved.
