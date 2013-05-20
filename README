@@ -19,11 +19,13 @@ supported by ONR MURI N00014-11-1-0087
 
 ** Installation: **
 
-The code compiles itself correctly upon the first run in serial (non-parallel) Matlab. So this step can be skipped if code is always to be run in serial mode.
+The code compiles itself correctly upon the first run in serial
+(non-parallel) Matlab. So this step can be skipped if code is always
+to be run in serial mode.
 
 To run in parallel, in the folder containing mcjacobian.prj first run:
-   deploytool -build mcjacobian.prj % wait until "Build finished." is output
-which will compile matlab code into C, improving the speed of computation.
+
+   deploytool -build mcjacobian.prj % wait until "Build finished." 
 
 ** Test (demo) system **
 This is a simple planar, time-dependent flow, 
@@ -45,23 +47,27 @@ R = fourgyre([], Ts, N, direction)
 fourgyre(R, 1, N, direction) 
 
 
-The demonstration is a sample short-time run, just to evaluate that the code runs validly and to familiarize the user with inputs and output. An end-user 
-would (at first) 
+The demonstration is a sample short-time run, just to evaluate that
+the code runs validly and to familiarize the user with inputs and
+output. An end-user would (at first)
+
 a) replace the vector field in fourgyre.m
-b) build a function similar to  meh_simulation.m and replace 
-   evaluations of instantaneous Jacobian with externally generated data,
-   either from more complicated simulations or experiments.
+
+b) build a function similar to meh_simulation.m and replace
+   evaluations of instantaneous Jacobian with externally generated
+   data, either from more complicated simulations or experiments.
 
 *** File functionality ***
 
 * Main files *
 
   meh_simulation.m -- Harness: this is the main file that performs
-  simulation and analysis of an arbitrary system specified as
-  a function handle. 
-  For more serious adaptation of the code, e.g., for analyzing 
-  experimentally derived data, one should follow the
-  analysis in meh_simulation, and develop a similar structure.
+  simulation and analysis of an arbitrary system specified as a
+  function handle.
+  
+  For more serious adaptation of the code, e.g., for analyzing
+  experimentally derived data, one should follow the analysis in
+  meh_simulation, and develop a similar structure.
 
   meh2d.m -- Takes a mesochronic Jacobian and computes quantifiers and
   classification for 2d flows

@@ -77,6 +77,12 @@ function retval = fourgyre(mydata, T, N, direction)
 %% SIMULATION
 if  isempty(mydata)
     
+    order = 2; % use 2nd order - safest before I check whether there are finite-precision errors in higher orders
+    h = 1e-2; % uniform timestep
+    dp = 1e-8; % spatial step for finite difference evaluation of inst. Jacobian
+    tol = 1e-3; % tolerance on zero-matching criteria (irrelevant for 2d analysis)
+    t0 = 0; % initial time
+    
     % determine the grid of inital conditions
     icgrid = linspace(0,1,N);
     [X,Y] = meshgrid( icgrid, icgrid);
@@ -88,12 +94,12 @@ if  isempty(mydata)
         -sin(2*pi*x(1,:)) .* cos(2*pi*x(2,:)) + epsilon*cos(2*pi*t) .* cos(2*pi*x(1,:)) .* sin(2*pi*x(2,:));...
          cos(2*pi*x(1,:)) .* sin(2*pi*x(2,:)) - epsilon*cos(2*pi*t) .* sin(2*pi*x(1,:)) .* cos(2*pi*x(2,:)) ];
     % run the simulation
-    mydata = meh_simulation(f, 0, T, direction, 'ode', ics, 1e-2, 1e-8, 2, 1e-3, 'fourgyre');
+    mydata = meh_simulation(f, t0, T, direction, 'ode', ics, h, dp, order, tol, 'fourgyre');
     
-    %% PLOTTING
 end
 retval = mydata;
 
+%% PLOTTING
 if nargout == 0 
     disp('Plotting the output.')
 
