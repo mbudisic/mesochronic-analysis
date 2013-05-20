@@ -1,14 +1,21 @@
 ** Mesochronic Analysis Toolbox ** 
 
-written by Marko Budisic, Dept. of
-Mechanical Engineering, UC Santa Barbara
-
-mbudisic@engr.ucsb.edu 
-
-supported by ONR MURI N00014-11-1-0087
 
 This is a Matlab toolbox intented to demonstrate the principles behind
 2d mesochronic analyses for incompressible dynamical systems.
+
+I would appreciate your feedback sent to
+mbudisic@engr.ucsb.edu 
+
+Additionally, if you happen to publish results based on mesochronic
+analysis using this code, please send me and 
+Igor Mezic mezic@engineering.ucsb.edu
+an e-mail with a reference.
+
+Written by 
+Marko Budisic, 
+Dept. of Mechanical Engineering, UC Santa Barbara
+supported by ONR MURI N00014-11-1-0087
 
 ** Installation: **
 
@@ -20,35 +27,41 @@ which will compile matlab code into C, improving the speed of computation.
 
 ** Test (demo) system **
 This is a simple planar, time-dependent flow, 
-used as the first example in
-Mezic, Loire, et al. Science (2010)
-
-The demonstration is a sample short-time run, just to evaluate that the code runs validly and to familiarize the user with inputs and output. An end-user 
-would (at first) mimic fourgyre.m, and either 
-a) replace the vector field 
-b) replace the evaluations of Jacobian of the vector field along trajectory	points
+used as the first example in Mezic, Loire, et al. Science (2010)
 
 Demo: fourgyre.m
 
-% open parallel jobs
+% open parallel jobs (in serial, the code takes a few minutes to run)
 matlabpool open; % 
 
 % computes mesochronic analysis
 % and store results in mcan_fourgyre_ode_fwdT_1.5_N_00900.mat
-R = fourgyre([], [0.5, 1, 1.5], 30, 1) 
+N = 30; % grid resolution
+Ts = [0.5, 1, 1.5]; % three different integration times
+direction = 1; % positive time arrow direction
+R = fourgyre([], Ts, N, direction)
 
 % visualize output for T=1
-fourgyre(R, 1, 30, 1) 
+fourgyre(R, 1, N, direction) 
+
+
+The demonstration is a sample short-time run, just to evaluate that the code runs validly and to familiarize the user with inputs and output. An end-user 
+would (at first) 
+a) replace the vector field in fourgyre.m
+b) build a function similar to  meh_simulation.m and replace 
+   evaluations of instantaneous Jacobian with externally generated data,
+   either from more complicated simulations or experiments.
 
 *** File functionality ***
 
 * Main files *
 
-  abcslice.m -- Demo; Can be used as a model for how analysis should
-  			    be performed and visualized
-
   meh_simulation.m -- Harness: this is the main file that performs
-  simulation and analysis of an arbitrary system
+  simulation and analysis of an arbitrary system specified as
+  a function handle. 
+  For more serious adaptation of the code, e.g., for analyzing 
+  experimentally derived data, one should follow the
+  analysis in meh_simulation, and develop a similar structure.
 
   meh2d.m -- Takes a mesochronic Jacobian and computes quantifiers and
   classification for 2d flows
@@ -56,7 +69,7 @@ fourgyre(R, 1, 30, 1)
 * Computational aides *
 
   evaluateJ_ode.m -- Evaluates the mesochronic Jacobian at a given
-  state point and time of a flow.
+  state point and time of a flow specified by a function handle.
 
   mcjacobian.m -- Computes a mesochronic Jacobian from evaluations of
   			      instantaneous Jacobian along trajectory
@@ -73,7 +86,6 @@ fourgyre(R, 1, 30, 1)
 
   mindist.m -- Computes the smallest difference of elements of a
   vector.
-
 
 * Visualization aides *
 
