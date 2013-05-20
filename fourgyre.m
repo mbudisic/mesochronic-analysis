@@ -1,19 +1,78 @@
 function retval = fourgyre(mydata, T, N, direction)
-% retval = fourgyre(mydata, T, N, tol)
+% retval = fourgyre(mydata, T, N, direction)
 %
 % A demo run for four gyre flow - simulation and visualization.
 %
 % If 'mydata' was passed, then the quantities in it are plotted for
 % time period T (scalar).
 %
-% If 'mydata' is empty, then a simulation is started
-% using 'meh_simulation' file and stored in a file (and returned).
+% If 'mydata' is [] (empty), then a simulation is started
+% using 'meh_simulation' file, results stored in a file 
+% whose name is output to Matlab window.
 %
-% T   - vector of integration times
-% N   - number of initial points per axis (total simulated is N^2)
-% direction - direction of time 
+% input:
+% T   - vector of integration times (positive values)
+% N   - dimension of the 2d grid: number of initial conditions 
+%       per axis (total simulated is N^2)
+% direction - direction of time (+1 or -1)
 %
 %
+% output fields (D is dimension of state space):
+%
+%       ics - N^2 x dim initial conditions 
+%         T - integration times used (vector of length K)
+%        t0 - inital time (scalar)
+%         h - integration step used for trajectories (positive scalar)
+%        dp - spatial step for evaluating inst. Jacobians using finite-difference
+%    method - method used for evaluating mesohyperbolic Jacobian (ode or fd)
+%     order - order of method used for evaluating mesohyperbolic Jacobian (if method = ode)
+%         f - vector field simulated
+%       tol - tolerance for zero matching criteria used
+% direction - direction of time flow (1 for forward, -1 for backward)
+% Jacobians - N^2-long cell array of mesochronic Jacobians, 
+%             each element is D x D x K or D x D x K, where K is length of vector T
+%      Dets - determinants of mc. Jacobians
+%             N^2 x K (columns correspond to elements of T)
+%    Traces - traces of mc. Jacobians, 
+%             N^2 x K (columns correspond to elements of T)
+%       Meh - mesohyperbolicity/mesoellipticity classes
+%             N^2 x K (columns correspond to elements of T)
+%     Compr - numerical compressibility (see below)
+%             N^2 x K (columns correspond to elements of T)
+%    NonNml - non-normality (see below) of mc. Jacobians
+%             N^2 x K (columns correspond to elements of T)
+%      FTLE - Finite Time Lyapunov Exponent (see meh2d.m and ftle.m)
+%             N^2 x K (columns correspond to elements of T)
+%       Hyp - hyperbolicity (see below) of mc. Jacobians
+%             N^2 x K (columns correspond to elements of T)
+% NonDefect - non-defectiveness (see below) of mc. Jacobians
+%             N^2 x K (columns correspond to elements of T)
+%
+% Mesohyperbolicity class:
+%    -1 - hyperbolicity, orientation preserving
+%    0  - ellipticity
+%    1  - hyperbolicity, orientation reversing
+%
+% Compressibility of mesochronic Jacobian J (theoretically identical to 0):
+%   T * det J + tr J
+%   This is a coarse measure of numerical error.
+%
+% Non-normality of mesochronic Jacobian J: Frobenius norm of the commutator
+%   || J* . J - J . J*||
+%   When non-normality is zero, J has complete orthogonal basis of eigenvectors 
+%   (it is *unitarily* diagonalizable)p.
+%
+% Hyperbolicity of mesochronic Jacobian J: 
+%   (T^2 * det J - 4) .* det J
+%   When positive, J has a pair of real eigenvalues (flow map is hyperbolic for the integration time).
+%
+% Non-defectiveness of mesochronic Jacobian J: 
+%   smallest distance between roots of the minimal polynomial of J
+%   When zero, J is defective, i.e., it has an 
+%   incomplete basis of eigenvectors (it is not diagonalizable)
+%
+% 
+
 
 %% SIMULATION
 if  isempty(mydata)

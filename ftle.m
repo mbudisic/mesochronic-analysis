@@ -8,6 +8,4 @@ validateattributes(T, {'numeric'}, {'positive'});
 
 J_Phi = eye(size(J)) + T*J; % convert mesochronic Jacobian to flow map Jacobian
 
-% compute FTLE - (factor 2 accounts for eigenvalue of CG tensor being
-%                 square of SV of Phi)
 ftle_val = log(norm(J_Phi,2)) / abs(T);

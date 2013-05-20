@@ -7,18 +7,30 @@ mbudisic@engr.ucsb.edu
 
 supported by ONR MURI N00014-11-1-0087
 
-
-** Intro **
-
 This is a Matlab toolbox intented to demonstrate the principles behind
-2d and 3d mesochronic analyses for incompressible dynamical systems.
+2d mesochronic analyses for incompressible dynamical systems.
 
-Demo: abcslice.m
+** Installation: **
 
-For a simple (and relatively quick, cca 3 min to compute)
-demonstration, in Matlab run
+The code compiles itself correctly upon the first run in serial (non-parallel) Matlab. So this step can be skipped if code is always to be run in serial mode.
 
-matlabpool open; % can be omitted on single-core computers
+To run in parallel, in the folder containing mcjacobian.prj first run:
+   deploytool -build mcjacobian.prj
+which will compile matlab code into C, improving the speed of computation.
+
+** Test (demo) system **
+This is a simple planar, time-dependent flow, 
+used as the first example in
+Mezic, Loire, et al. Science (2010)
+
+The demonstration is a sample short-time run, just to evaluate that the code runs validly and to familiarize the user with inputs and output. An end-user 
+would (at first) mimic fourgyre.m, and either 
+a) replace the vector field 
+b) replace the evaluations of Jacobian of the vector field along trajectory	points
+
+Demo: fourgyre.m
+
+matlabpool open; % 
 abcslice([], 0.5, 50, 1e-3)
 
 For a more serious analysis, run

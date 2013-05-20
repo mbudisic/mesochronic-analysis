@@ -9,10 +9,44 @@ function [classes, quants, spectral] = meh2d( T, J )
 %
 %
 % returns:
-% classes - classification into mesohyperbolic types
-% compr - numerical compressibility
-% spectral.dets - determinants (if passed as input, this is just a copy)
-% spectral.traces - traces (if passed as input, this is just a copy)
+% 
+% -- classes
+%    Mesohyperbolicity class
+%    -1 - hyperbolicity, orientation preserving
+%    0  - ellipticity
+%    1  - hyperbolicity, orientation reversing
+%
+% -- quants.compr
+% Compressibility of mesochronic Jacobian J (theoretically identical to 0):
+%   T * det J + tr J
+%   This is a coarse measure of numerical error.
+%
+% -- quants.NonNml
+% Non-normality of mesochronic Jacobian J: Frobenius norm of the commutator
+%   || J* . J - J . J*||
+%   When non-normality is zero, J has complete orthogonal basis of eigenvectors 
+%   (it is *unitarily* diagonalizable)p.
+%
+% -- quants.Hyp
+% Hyperbolicity of mesochronic Jacobian J: 
+%   (T^2 * det J - 4) .* det J
+%   When positive, J has a pair of real eigenvalues (flow map is hyperbolic for the integration time).
+%
+% -- quants.NonDefect
+% Non-defectiveness of mesochronic Jacobian J: 
+%   smallest distance between roots of the minimal polynomial of J
+%   When zero, J is defective, i.e., it has an 
+%   incomplete basis of eigenvectors (it is not diagonalizable)
+% 
+% -- quants.FTLE
+%    Finite Time Lyapunov Exponent 
+%    (1/T) * log norm(J)
+%    norm is 2-norm, T is always positive 
+%
+% -- spectral.Dets - determinants of mc. Jacobians
+% -- spectral.Traces - traces of mc. Jacobians, 
+
+
 
 validateattributes(T, {'numeric'},{'scalar','nonnegative','finite'} );
 validateattributes(J, {'cell'}, {});
@@ -52,8 +86,9 @@ quants.NonDefect = cellfun( @(p) mindist( roots(p) ), Mp ); % mindist.m distribu
 % compressibility
 quants.Compr = T * Dets + Traces;
 
-
 %% computation of mesohyperbolicity
+
+% figure out which indices of initial conditions correspond to each class
 classes_ind.hyp = quants.Hyp >= 0;
 
 classes_ind.mh_flipping = (Dets >= 4/(T^2)) & classes_ind.hyp;
