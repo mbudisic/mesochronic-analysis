@@ -7,19 +7,19 @@ function retval = fourgyre(mydata, T, N, direction)
 % time period T (scalar).
 %
 % If 'mydata' is [] (empty), then a simulation is started
-% using 'meh_simulation' file, results stored in a file 
+% using 'meh_simulation' file, results stored in a file
 % whose name is output to Matlab window.
 %
 % input:
 % T   - vector of integration times (positive values)
-% N   - dimension of the 2d grid: number of initial conditions 
+% N   - dimension of the 2d grid: number of initial conditions
 %       per axis (total simulated is N^2)
 % direction - direction of time (+1 or -1)
 %
 %
 % output fields (D is dimension of state space):
 %
-%       ics - N^2 x dim initial conditions 
+%       ics - N^2 x dim initial conditions
 %         T - integration times used (vector of length K)
 %        t0 - inital time (scalar)
 %         h - integration step used for trajectories (positive scalar)
@@ -29,11 +29,11 @@ function retval = fourgyre(mydata, T, N, direction)
 %         f - vector field simulated
 %       tol - tolerance for zero matching criteria used
 % direction - direction of time flow (1 for forward, -1 for backward)
-% Jacobians - N^2-long cell array of mesochronic Jacobians, 
+% Jacobians - N^2-long cell array of mesochronic Jacobians,
 %             each element is D x D x K or D x D x K, where K is length of vector T
 %      Dets - determinants of mc. Jacobians
 %             N^2 x K (columns correspond to elements of T)
-%    Traces - traces of mc. Jacobians, 
+%    Traces - traces of mc. Jacobians,
 %             N^2 x K (columns correspond to elements of T)
 %       Meh - mesohyperbolicity/mesoellipticity classes
 %             N^2 x K (columns correspond to elements of T)
@@ -59,19 +59,19 @@ function retval = fourgyre(mydata, T, N, direction)
 %
 % Non-normality of mesochronic Jacobian J: Frobenius norm of the commutator
 %   || J* . J - J . J*||
-%   When non-normality is zero, J has complete orthogonal basis of eigenvectors 
+%   When non-normality is zero, J has complete orthogonal basis of eigenvectors
 %   (it is *unitarily* diagonalizable)p.
 %
-% Hyperbolicity of mesochronic Jacobian J: 
+% Hyperbolicity of mesochronic Jacobian J:
 %   (T^2 * det J - 4) .* det J
 %   When positive, J has a pair of real eigenvalues (flow map is hyperbolic for the integration time).
 %
-% Non-defectiveness of mesochronic Jacobian J: 
+% Non-defectiveness of mesochronic Jacobian J:
 %   smallest distance between roots of the minimal polynomial of J
-%   When zero, J is defective, i.e., it has an 
+%   When zero, J is defective, i.e., it has an
 %   incomplete basis of eigenvectors (it is not diagonalizable)
 %
-% 
+%
 
 
 %% SIMULATION
@@ -92,17 +92,55 @@ if  isempty(mydata)
     epsilon = 0.1;
     f = @(t,x)[...
         -sin(2*pi*x(1,:)) .* cos(2*pi*x(2,:)) + epsilon*cos(2*pi*t) .* cos(2*pi*x(1,:)) .* sin(2*pi*x(2,:));...
-         cos(2*pi*x(1,:)) .* sin(2*pi*x(2,:)) - epsilon*cos(2*pi*t) .* sin(2*pi*x(1,:)) .* cos(2*pi*x(2,:)) ];
-    % run the simulation
-    mydata = meh_simulation(f, t0, T, direction, 'ode', ics, h, dp, order, tol, 'fourgyre');
+        cos(2*pi*x(1,:)) .* sin(2*pi*x(2,:)) - epsilon*cos(2*pi*t) .* sin(2*pi*x(1,:)) .* cos(2*pi*x(2,:)) ];
+        
+    % form the filename for saving the a Jacobians
+    if direction > 0
+        dirlab = 'fwd';
+    else
+        dirlab = 'bwd';
+    end
     
+    filename = sprintf('fourgyre_jac_o%d_N%d_%sT_%.1f.mat', order, N, dirlab, max(T));
+    
+    % if file exist, load Jacobian data
+    if exist(filename,'file')
+        disp(['Load ' filename]);
+        Jdata = load(filename);
+        
+    % if file does not exist, simulate the system
+    else
+        disp(['Simulating ' filename]);
+        Jdata = meh_simulation(f, t0, T, direction, 'ode', ics, h, dp, order, tol);
+        save(filename,'-struct', 'Jdata');
+    end
+    
+    % analyze Jacobian data using mesohyperbolic analysis
+    filename = sprintf('fourgyre_meh_o%d_N%d_%sT_%.1f.mat', order, N, dirlab, max(T));
+    MCdata = meh_analysis(T, Jdata.Jacobians, 2);
+    save(filename,'-struct', 'MCdata');
+    
+    % group evaluations of the Jacobian and mesochronic analysis into the
+    % same data set
+    for fname = fieldnames(Jdata).'
+        mydata.(fname{1}) = Jdata.(fname{1});
+    end
+    
+    for fname = fieldnames(MCdata).'
+        mydata.(fname{1}) = MCdata.(fname{1});
+    end
+    
+    % save joint data set
+    filename = sprintf('fourgyre_o%d_N%d_%sT_%.1f.mat', order, N, dirlab, max(T));
+    save(filename,'-struct', 'mydata');
+    
+    retval = mydata;
 end
-retval = mydata;
 
 %% PLOTTING
-if nargout == 0 
+if nargout == 0
     disp('Plotting the output.')
-
+    
     % determine the initial condition grid from passed data
     Nic = size(mydata.ics, 1);
     N = fix(sqrt(Nic));
@@ -158,7 +196,7 @@ if nargout == 0
     
     set(gca, 'Color', 'black');
     if ~isempty(invedges)
-    alpha(1-invedges)
+        alpha(1-invedges)
     end
     
     cb = findobj(gcf,'tag','Colorbar');
@@ -173,12 +211,12 @@ if nargout == 0
         setaxes(mydata.FTLE(:,ind));
         set(gca, 'Color', 'green');
         if ~isempty(invedges)
-        alpha(1-invedges)
+            alpha(1-invedges)
         end
         
         titleline =['FTLE' tstampline];
-    title(titleline)
-    set(gcf,'name',titleline);
+        title(titleline)
+        set(gcf,'name',titleline);
         
         
     else
@@ -192,9 +230,9 @@ if nargout == 0
         setaxes(log10(mydata.NonNml(:,ind)));
         cb = findobj(gcf,'tag','Colorbar');title(cb,'log_{10}')
         titleline = ['Non-normality' tstampline];
-            title(titleline)
-    set(gcf,'name',titleline);
-
+        title(titleline)
+        set(gcf,'name',titleline);
+        
     else
         disp('No NonNml field (deviation from normal Jacobian) available')
     end
@@ -208,14 +246,14 @@ if nargout == 0
         colormap( map(end:-1:1, :) );
         cb = findobj(gcf,'tag','Colorbar');title(cb,'log_{10}')
         titleline= ['Non-defectiveness' tstampline];
-            title(titleline)
-    set(gcf,'name',titleline);
-
+        title(titleline)
+        set(gcf,'name',titleline);
+        
     else
         disp('No NonDefect field (deviation from defective Jacobian) available')
     end
     
-        
+    
     % Numerical Compressibility (quantifies error in computation of
     % Jacobian)
     if isfield(mydata,'Compr')
@@ -224,8 +262,8 @@ if nargout == 0
         setaxes(log10(abs(mydata.Compr(:,ind))));
         cb = findobj(gcf,'tag','Colorbar');title(cb,'log_{10}')
         titleline=['Numerical compressibility' tstampline];
-    title(titleline)
-    set(gcf,'name',titleline);
+        title(titleline)
+        set(gcf,'name',titleline);
         
     else
         disp('No Compr field (numerical compressibility) available')
@@ -239,7 +277,7 @@ function retval = setaxes(fulldata)
 shading flat; axis([0,1, 0, 1]);
 colorbar
 try
-colormap morgenstemning
+    colormap morgenstemning
 catch
     disp('Download "morgenstemning" color scheme from MATLAB Central (google: colormap morgenstemning) for grayscale-compatible colors ;)');
     colormap hot
@@ -251,9 +289,9 @@ xlabel('x [\pi]')
 ylabel('y [\pi]')
 
 if exist('fulldata','var')
-     disp('Normalizing axes')
-     caxis( prctile(fulldata(:), [1, 99]) );
-     retval = prctile(fulldata(:), [1, 99]);
+    disp('Normalizing axes')
+    caxis( prctile(fulldata(:), [1, 99]) );
+    retval = prctile(fulldata(:), [1, 99]);
 end
 
 function retval = ridge( M, pct, sgn )
