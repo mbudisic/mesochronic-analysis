@@ -1,4 +1,4 @@
-function retval = meh_analysis(T, Jacobians, Ndim)
+function retval = meh_analysis(T, Jacobians, Ndim, tol)
 % meh_analysis(T, Jacobians)
 %
 % Mesochronic Analysis of a sequence of mesochronic Jacobians.
