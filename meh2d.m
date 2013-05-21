@@ -3,8 +3,8 @@ function [classes, quants, spectral] = meh2d( Ts, Js )
 %
 % inputs:
 %
-% T - vector of integration periods (length K)
-% J - mesochronic Jacobian, 2 x 2 x K
+% Ts - vector of integration periods (length K)
+% Js - mesochronic Jacobian, 2 x 2 x K
 %
 %
 % all the return fields are vectors of size of T
@@ -50,6 +50,8 @@ function [classes, quants, spectral] = meh2d( Ts, Js )
 validateattributes(Ts, {'numeric'},{'nonnegative','finite'} );
 validateattributes(Js, {'numeric'}, {});
 
+D = 2;
+assert( size(Js, 1) == D && size(Js, 2) == D, 'Jacobians are not 2x2xK matrices')
 assert( numel(Ts) == size(Js,3), 'Number of Jacobians and integration periods has to be the same');
 
 K = numel(Ts);

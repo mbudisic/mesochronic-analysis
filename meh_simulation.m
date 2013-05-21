@@ -1,12 +1,12 @@
 function retval = meh_simulation(f, t0, T, direction, method, ics, h, dp, order, tol, filetag)
 % meh_simulation(f, t0, T, direction, method, ics, h, dp, order, tol,  name)
 %
-% Compute mesochronic analysis of a dynamical system given by 
+% Compute mesochronic analysis of a dynamical system given by
 % the vector field f under assumption of incompressibility.
 %
 % f - vector field (vectorized function handle)
 %     Please use vectorized flow fields. In other words, if your
-%     vector field is 
+%     vector field is
 %     f = @(t,x)[ -x(2); x(1) ]
 %     its vectorized analogue would be
 %     f = @(t,x)[ -x(2,:); x(1,:) ]
@@ -21,7 +21,7 @@ function retval = meh_simulation(f, t0, T, direction, method, ics, h, dp, order,
 % h - discretization of time
 % dp - finite difference variation (for instantaneous Jacobian evaluation)
 % order - order of Adams-Bashforth
-%         -1 for highest possible Adams-Bashforth method (currently 6), 
+%         -1 for highest possible Adams-Bashforth method (currently 6),
 %          1-6 for appropriate order of Adams-Bashforth
 % tol - tolerance on evaluating zero-matching criteria (currently only for
 %       3d)
@@ -98,7 +98,7 @@ if isfield(retval, 'Jacobians') && isfield(retval,'ics')
         error('Jacobian data does not match input data. Exiting');
     end
     
-% no Jacobian data found - run the simulations    
+    % no Jacobian data found - run the simulations
 else
     
     retval.ics = ics;
@@ -142,7 +142,7 @@ else
     pause(0.5);
     
     retval.Jacobians = Jacobians;
-
+    
 end
 
 save(filename, '-struct','retval')
@@ -171,6 +171,9 @@ end
 % evaluate quantifiers for Jacobians
 parfor m = 1:Npoints
     
+    % select the appropriate jacobian
+    myJacobians = Jacobians{m};
+    
     % temporary parallel job storage
     myDets = zeros(1,length(T));
     myTraces = zeros(size(myDets));
@@ -182,35 +185,25 @@ parfor m = 1:Npoints
     myHyp = zeros(size(myDets));
     
     myTrCof = zeros(size(myDets));
-    myJacobians = Jacobians{m};
     
-    % for each integration period - this could likely be automatized
-    % within meh2d/meh3d functions
-    % The faculty within meh2d/3d already exists, but we have to make
-    % sure that it can handle a vector of Ts, appropriate slice
-    % Jacobians, etc.
-    for n = 1:length(T)
-        
-        [classes, quants, spectral] = meh( T(n), myJacobians(:,:,n) );
-        
-        % spectral quantities
-        myDets(n) = spectral.Dets;
-        myTraces(n) = spectral.Traces;
-        if isfield(spectral,'TrCofs')
-            myTrCof(n) = spectral.TrCofs;
-        end
-        
-        % quantifiers of mesochronic analysis criteria
-        myCompr(n) = quants.Compr;
-        myNonNml(n) = quants.NonNml;
-        myNonDefect(n) = quants.NonDefect;
-        myFTLE(n) = quants.FTLE;
-        myHyp(n) = quants.Hyp;
-        
-        % mesochronic classes
-        myMeh(n) = classes;
-        
+    [classes, quants, spectral] = meh( T, myJacobians );
+    
+    % spectral quantities
+    myDets = spectral.Dets;
+    myTraces = spectral.Traces;
+    if isfield(spectral,'TrCofs')
+        myTrCof = spectral.TrCofs;
     end
+    
+    % quantifiers of mesochronic analysis criteria
+    myCompr = quants.Compr;
+    myNonNml = quants.NonNml;
+    myNonDefect = quants.NonDefect;
+    myFTLE = quants.FTLE;
+    myHyp = quants.Hyp;
+    
+    % mesochronic classes
+    myMeh = classes;
     
     % copy temporary to output storage
     Dets(m,:) = myDets(:);
