@@ -46,31 +46,36 @@ R = fourgyre([], Ts, N, direction)
 % visualize output for T=1
 fourgyre(R, 1, N, direction) 
 
-
 The demonstration is a sample short-time run, just to evaluate that
 the code runs validly and to familiarize the user with inputs and
 output. An end-user would (at first)
 
 a) replace the vector field in fourgyre.m
 
-b) build a function similar to meh_simulation.m and replace
-   evaluations of instantaneous Jacobian with externally generated
-   data, either from more complicated simulations or experiments.
+b) completely do away with simulation meh_simulation.m and 
+   run meh_analysis.m on an alternatively derived 
+   mesochronic Jacobians
 
 *** File functionality ***
 
 * Main files *
 
-  meh_simulation.m -- Harness: this is the main file that performs
-  simulation and analysis of an arbitrary system specified as a
-  function handle.
-  
-  For more serious adaptation of the code, e.g., for analyzing
-  experimentally derived data, one should follow the analysis in
-  meh_simulation, and develop a similar structure.
+  meh_simulation.m -- Simulation harness: this is the main file that performs
+  simulation of an arbitrary system specified as a
+  function handle and computes mesochronic Jacobian for a
+  specific set of initial conditions and integration times.
 
-  meh2d.m -- Takes a mesochronic Jacobian and computes quantifiers and
-  classification for 2d flows
+  This is performed in parallel for initial conditions.
+
+  meh_analysis.m -- Analysis harness: this is the file that 
+  runs mesochronic analysis on mesochronic Jacobians, e.g., those
+  computed by meh_simulation.
+
+  This is performed in parallel for initial conditions.
+  
+  meh2d.m -- Analysis at a single point. Takes several Jacobians,
+  all corresponding to the same initial condition, but different
+  integration lengths, and computes their mesochronic analysis.
 
 * Computational aides *
 
@@ -86,9 +91,6 @@ b) build a function similar to meh_simulation.m and replace
 
   jacobian_fd.m -- Computes instantaneous Jacobiaian using central
   difference method on a vector field.
-
-  matpolys.m -- Computes characteristic and minimal polynomials of a
-  matrix.
 
   mindist.m -- Computes the smallest difference of elements of a
   vector.
