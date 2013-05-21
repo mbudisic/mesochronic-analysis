@@ -161,11 +161,11 @@ Hyp =  zeros( size(Dets));
 
 if Ndim == 3
     disp('Using 3d mesohyperbolicity')
-    assert(exist('meh3d','file'), '3d analysis not yet implemented');
-    meh = @(T, J)meh3d( T, {J}, tol);
+    assert(exist('meh3d','file') == 2, '3d analysis not yet implemented');
+    meh = @(T, J)meh3d( T, J, tol);
 else
     disp('Using 2d mesohyperbolicity')
-    meh = @(T,J)meh2d(T,{J});
+    meh = @(T,J)meh2d(T,J);
 end
 
 % evaluate quantifiers for Jacobians
