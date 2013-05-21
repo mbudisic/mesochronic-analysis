@@ -4,14 +4,20 @@ function retval = meh_simulation(f, t0, T, direction, method, ics, h, dp, order,
 % Compute mesochronic analysis of a dynamical system given by 
 % the vector field f under assumption of incompressibility.
 %
-% f - vector field (function handle)
+% f - vector field (vectorized function handle)
+%     Please use vectorized flow fields. In other words, if your
+%     vector field is 
+%     f = @(t,x)[ -x(2); x(1) ]
+%     its vectorized analogue would be
+%     f = @(t,x)[ -x(2,:); x(1,:) ]
 % t0 - initial time
 % T - vector of *positive* integration periods
 % direction - direction of integration; positive for forward, negative for
 %             backward
 % method - method of evaluating mesochronic Jacobian
 %          'ode' (Adams-Bashforth evolution) or 'fd' (finite difference)
-% ics - Npoints x 3 list of initial conditions
+% ics - Npoints x D list of initial conditions, where D is dimension of state
+%       space (2 or 3)
 % h - discretization of time
 % dp - finite difference variation (for instantaneous Jacobian evaluation)
 % order - order of Adams-Bashforth
