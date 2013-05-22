@@ -21,7 +21,12 @@ supported by ONR MURI N00014-11-1-0087
 
 The code compiles itself correctly upon the first run in serial
 (non-parallel) Matlab. So this step can be skipped if code is always
-to be run in serial mode.
+to be run in serial mode. Note that the code was tested with
+Matlab 2012b and newer as parallel running of compiled code and 
+variable matrix sizes were not implemented until 2012b.
+
+For compilation problems, please consult Matlab Coder (not Compiler!) compatibility chart:
+http://www.mathworks.com/support/compilers
 
 To run in parallel, in the folder containing mcjacobian.prj first run:
 
