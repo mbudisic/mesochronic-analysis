@@ -74,7 +74,7 @@ retval.f = f;
 retval.tol = tol;
 retval.direction = direction;
 
-if matlabpool('size') < 2
+if matlabpool('size') < 2 && ~verLessThan('matlab', '8')
     warning('Matlab running in serial mode. On multicore computers you can reduce computation time by opening parallel matlab jobs, e.g., run "matlabpool open"')
 end
 

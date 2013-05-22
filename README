@@ -19,18 +19,17 @@ supported by ONR MURI N00014-11-1-0087
 
 ** Installation: **
 
-The code compiles itself correctly upon the first run in serial
-(non-parallel) Matlab. So this step can be skipped if code is always
-to be run in serial mode. Note that the code was tested with
-Matlab 2012b and newer as parallel running of compiled code and 
-variable matrix sizes were not implemented until 2012b.
+On Matlab 2012b and newer, if faster execution is desired (highly recommended), run
+
+   deploytool -build mcjacobian.prj
+
+and wait until "Build finished." message. This will convert mcjacobian.m to
+C-code and compile it into mcjacobian_mat MEX. The code should detect
+whether there exists a compiled version and run it; if there is no compiled
+version, the standard Matlab code will be run instead.
 
 For compilation problems, please consult Matlab Coder (not Compiler!) compatibility chart:
 http://www.mathworks.com/support/compilers
-
-To run in parallel, in the folder containing mcjacobian.prj first run:
-
-   deploytool -build mcjacobian.prj % wait until "Build finished." 
 
 ** Test (demo) system **
 This is a simple planar, time-dependent flow, 

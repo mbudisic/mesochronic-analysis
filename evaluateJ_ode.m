@@ -50,23 +50,22 @@ Ji = jacobian_fd(fsim, tout, yout, dp);
 retstep = fix(T/h);
 
 % solve the Jacobian equation
-if exist('mcjacobian_mex') ~= 3 && exist('deploytool') == 2
-    mypath = mfilename('fullpath');
-    mypath = mypath(1:find('/' == mypath, 1, 'last'));
-    mcpath = [mypath 'mcjacobian.prj'];
-    worker = getCurrentTask();
-    if ~isempty(worker)
-        error('deploying cannot be done automatically in multithreaded mode. manually compile mcjacobian.prj or re-run command in a single thread mode')
-    else
-    warning('mcjacobian can be compiled into MEX file. Attempting to build mcjacobian.prj');
-    eval(['deploytool -build ' mcpath]);
-    error('deploying completed. re-run');
-    end
-end
-
 try
     [mJ, ~, order] = mcjacobian_mex(h, Ji, retstep, order);
 catch
-    warning(['Runnin slow, non-compiled mcjacobian. mcjacobian.prj did not build on its own. It can be compiled by going to ' mypath])
+    
+    if verLessThan('matlab', '8')
+        warning('MATLAB:MesochronicAnalysis:Compile', ...
+            sprintf(['Cannot run compiled version of code on releases older than 2012b.\n',...
+            'Running uncompiled code.\n',...
+            'Turn this warning off by issuing: warning(''off'', ''MATLAB:MesochronicAnalysis:Compile'')']));
+    else
+        warning('MATLAB:MesochronicAnalysis:Compile', ...
+            sprintf(['Compiled version does not exist.\nPlease run ''deploytool -build mcproject.prj'' prior to running for faster computations.\n',...
+            'Running uncompiled code.\n',...
+            'Turn this warning off by issuing: warning(''off'', ''MATLAB:MesochronicAnalysis:Compile'')']));
+    end
+    
+    
     [mJ, ~, order] = mcjacobian(h, Ji, retstep, order);
 end
