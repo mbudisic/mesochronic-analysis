@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <deployment-project plugin="plugin.matlabcoder" plugin-version="R2013a">
-  <configuration target="target.matlab.coder" target-name="MEX, C, and C++ Code Generation" name="mcjacobian" location="/Users/mbudisic/Work/MatlabToolbox/meh" file="/Users/mbudisic/Work/MatlabToolbox/meh/mcjacobian.prj" build-checksum="389420869">
+  <configuration target="target.matlab.coder" target-name="MEX, C, and C++ Code Generation" name="mcjacobian" location="/Users/mbudisic/Work/MatlabToolbox/meh" file="/Users/mbudisic/Work/MatlabToolbox/meh/mcjacobian.prj" build-checksum="249155123">
     <profile key="profile.mex">
       <param.MergeInstrumentationResults>false</param.MergeInstrumentationResults>
       <param.BuiltInstrumentedMex>false</param.BuiltInstrumentedMex>
@@ -395,7 +395,7 @@
       <param.DefaultFixedPointSignedness />
     </unset>
     <fileset.entrypoints>
-      <file value="${PROJECT_ROOT}/mcjacobian.m" custom-data-expanded="true">
+      <file value="${PROJECT_ROOT}/mcjacobian.m" custom-data-expanded="false">
         <Inputs fileName="mcjacobian.m" functionName="mcjacobian">
           <Input Name="h">
             <Class>double</Class>
@@ -413,7 +413,7 @@
             <UserDefined>true</UserDefined>
             <Complex>false</Complex>
           </Input>
-          <Input Name="retstep">
+          <Input Name="mcStepsRequested">
             <Class>double</Class>
             <Size>1 x :inf</Size>
             <Value />
@@ -421,7 +421,7 @@
             <UserDefined>true</UserDefined>
             <Complex>false</Complex>
           </Input>
-          <Input Name="order">
+          <Input Name="orderRequested">
             <Class>double</Class>
             <Size>1 x 1</Size>
             <Value />

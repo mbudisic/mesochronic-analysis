@@ -1,61 +1,151 @@
-function [retval_jacs, retval_steps, order] = mcjacobian(h, Ji, retstep, order)
+function [mcJacobians, mcSteps, orderUsed] = mcjacobian(h, Ji, mcStepsRequested, orderRequested)
 % MCJACOBIAN
 %
-% Compute the mesochronic Jacobian evolved over the span t.
+% [mcJacobians, mcSteps, orderUsed] = mcjacobian(h, Ji, mcStepsRequested, orderRequested)
 %
-% h - timestep (double)
+% Compute the mesochronic Jacobian using Adams-Bashforth method.
+% For reference, see chapter on Linear Multistep methods in
+%
+% U.M. Ascher and L.R. Petzold, 
+% "Computer Methods for Ordinary Differential Equations and Differential-Algebraic Equations"
+% (Society for Industrial and Applied Mathematics (SIAM), 
+% Philadelphia, PA, 1998), pp. xviii?314.
+%
+% Adams-Bashforth (A-B) is a fixed timestep method, therefore duration of 
+% its solution is given as T = Nt * h
+% where Nt is the number of steps, and h is the duration of each timestep.
+%
+%
+% This function applies A-B to evolution ODE of the mesochronic Jacobian.
+% The inputs from which the increments are computed depend only on
+% the evaluation of instantaneous Jacobians (Ji) along a trajectory.
+% Typically, only the final-time mesochronic Jacobian is needed,
+% or the values at a relatively-sparse set of intermediate timesteps.
+% Therefore, to save memory, the function asks the user to specify
+% steps of interest (mcStepsRequested) at which 
+% evaluations of the mesochronic Jacobian are required.
+%
+% It is important to note that this function does not distinguish between
+% time-varying and time-invariant systems, nor between forward-time and
+% backward-time evolutions. The Ji are assumed to be evaluated along the
+% equally spaced (value: h) intervals between 
+% initial and terminal time instances. Whether this means
+% t0, t0+h, t0+2h, ..., t0 + T
+% or
+% t0, t0-h, t0-2h, ..., t0 - T
+% is irrelevant from the standpoint of this method.
+%
+% A-B is not a single method, but rather a family of methods, parametrized
+% by the order of the method (orderRequested). Currently, orders 
+% implemented range from 1 to 6.
+%
+% *** inputs: ***
+% 
+% h - length of a timestep (positive)
 % Ji - array of instantaneous Jacobian matrices evaluated at times
-%      uniformly spaced by h (each (:,:, k) is a Jacobian )
-% steps - vector indices of returned steps, 0-started, mod(, Nsteps)
-%       - 0 - first step
-%       - -1 - last step
-%       -
-% order - order of integration, currently 1-6
-%       - if negative, highest allowed order is selected
+%      uniformly spaced by h (each (:,:,k) is a Jacobian )
+%    D x D x Nt matrix, where 
+%    D is the dimension of the state space, 
+%    Nt is the length of time evolution (maximum number of timesteps)
 %
-% returns:
+% mcStepsRequested - 1 x N vector of ordinal numbers of timesteps
+%                    for which mesochronic Jacobian will be returned
+%                  each element is a value between
+%                  0 and Nt-1, where Nt is determined from length of Ji
 %
-% retval_jacs - mesochronic jacobians taken at requested steps
-% retval_steps - requested steps, corresponding to jacobians in retval_jacs
+%                  0 -- indicates the inital step
+%                  Nt -- indicates the final step
+%                  Additionally, user can pass any integer as a value
+%                  for elements of mcStepsRequested.
+%                  Values outside [0, Nt-1] range will be taken as
+%                  modulo-Nt, to allow, 
+%                  e.g., last step to be requested as -1,
+%                        next-to-last step to be requested as -2, etc.
+%                  the actual values of steps for which mc. Jacobians are
+%                  returned is passed as an output
+%                  
+% orderRequested  - preferred order of the A-B method. 
+%                   Allowed values:
+%                   < 0 -- maximum order advisable to use
+%                   1 to 6 -- currently implemented orders
+%                   Not allowed values:
+%                   0  -- reserved for finite-difference (not A-B) method
+%                   > 6 -- not yet implemented
+%
+% *** outputs: ***
+%
+% mcJacobians - mesochronic Jacobian
+%               D x D x N - where 
+%               D is the state dimension,
+%               N is the number of iteration steps returned
+% mcSteps     - 1 x N -- orders of iteration steps returned
+% orderUsed   - the actual order A-B method used; may or may not be equal 
+%               to orderRequested (input) 
+%
 
 if h <= 0
     error('Timestep has to be positive')
 end
 
 %% choose order of the method
-[abrhs, ablhs] = adamsbashforth;
 
-if order < 0
-    order = length(ablhs);
-elseif order > length(ablhs)
-    error('Maximum available Adams-Bashforth order exceeded. Set to -1 for automatically setting to maximal order implemented')
+% return coefficients of all available orders
+[abrhs, ablhs, maxOrder] = adamsbashforth;
+
+assert( orderRequested ~= 0,... 
+    ['Zeroth order of Adams-Bashforth requested. ',...
+    'By internal convention, we use 0 to denote finite difference',...
+    'method (not Adams-Bashforth). Check calling function for errors'])
+
+% determine order that is used based on the request
+%
+if orderRequested < 0
+    % < 0 -> orderUsed to maximum available
+    
+    % current implementation has roundoff (or other numerical) errors
+    % in orders higher than 3, therefore we artificially set 3
+    % as the maximum order unless user explicitly requests 4,5,6
+    %
+    % after debugging, change the following line to read
+    % orderUsed = maxOrder;
+    orderUsed = 3;
+elseif orderRequested > maxOrder
+    % > maxOrder - report implementation limitation
+    
+    error('Maximum available Adams-Bashforth order exceeded. Set to -1 for automatically setting to maximal order implemented.')
+else
+    % everything is fine, use requested order
+    orderUsed = orderRequested;
 end
+    
 
 %% storage for intermediate results
-Jisize = size(Ji);
-Nt = Jisize(3);
+sizeOfJacobians = size(Ji); % NxN
+Nt = sizeOfJacobians(3);    % N of time steps
 
 % storage for mesochronic jacobian steps; index 1 is current, index 2 is previous step, index 3 two steps ago etc.
-F = zeros( [Jisize(1:2), order+1] );
+J_steps = zeros( [sizeOfJacobians(1:2), orderUsed+1] );
 
 % zeroth step
-F(:,:,1) = Ji(:,:,1);
+J_steps(:,:,1) = Ji(:,:,1);
 
 %% determine which steps to return back to caller
-if isempty(retstep)
-    retstep = -1;
+if isempty(mcStepsRequested)
+    mcStepsRequested = -1;
 end
 
 % take the mod of retstep to rewrap
-assert(isvector(retstep), 'retstep has to be a vector');
-retstep = mod(retstep, Nt);
-retstep = unique(retstep);
+assert(isvector(mcStepsRequested), 'retstep has to be a vector');
+mcStepsRequested = mod(mcStepsRequested, Nt);
+mcStepsRequested = unique(mcStepsRequested);
 
-retlength = length(retstep);
+numberOfStepsRequested = length(mcStepsRequested);
 
 % storage for return values
-retval_steps = zeros(1, retlength);
-retval_jacs = zeros( Jisize(1), Jisize(2), retlength);
+mcSteps = zeros(1, numberOfStepsRequested);
+mcJacobians = zeros( sizeOfJacobians(1), ...
+                     sizeOfJacobians(2), ...
+                     numberOfStepsRequested);
 
 %% main update loop
 maxStep = Nt-1;
@@ -65,35 +155,30 @@ for n = 1:maxStep
     
     % move F a step further, dropping oldest record, and inserting empty to the
     % front
-    F = shiftstep(F);
+    J_steps = shiftstep(J_steps);
     
     % Degrade order if we have not computed enough steps to use a higher order method.
     % This way, lower order methods automatically initialize higher ones.
-    eord = min( [n, order] ); % effective order
+    effectiveOrder = min( [n, orderUsed] ); % effective order
     
     % form multiplication coefficient
-    coeff = h * abrhs(eord, 1:eord)/ablhs(eord);
+    coeff = h * abrhs(effectiveOrder, 1:effectiveOrder)/ablhs(effectiveOrder);
     
     % approximate right hand side of the evolution
-    deltaJ = coeff(1) * dJ_dt(n-1, F(:,:,2), Ji, h);
-    for bstep = 2:eord
-        deltaJ = deltaJ + coeff(bstep) * dJ_dt(n-bstep, F(:,:,1+bstep), Ji, h);
+    deltaJ = coeff(1) * dJ_dt(n-1, J_steps(:,:,2), Ji, h);
+    for bstep = 2:effectiveOrder
+        deltaJ = deltaJ + coeff(bstep) * dJ_dt(n-bstep, J_steps(:,:,1+bstep), Ji, h);
     end
     
     % update jacobian
-    F(:,:,1) = F(:,:,2) + deltaJ;
+    J_steps(:,:,1) = J_steps(:,:,2) + deltaJ;
     
     % detect a saving step
-    savestep = find(n == retstep, 1, 'first');
-    if ~isempty(savestep)
-        savestep = min(savestep);
-    else
-        savestep = NaN;
-    end
+    [~,savestep] = ismember(n, mcStepsRequested);
     
-    if ~isnan(savestep)
-        retval_steps(savestep) = n;
-        retval_jacs(:,:,savestep) = F(:,:,1);
+    if savestep > 0
+        mcSteps(savestep) = n;
+        mcJacobians(:,:,savestep) = J_steps(:,:,1);
     end
 end
 
@@ -108,25 +193,61 @@ retval = cat(3,...
     zeros(size(mf,1),size(mf,2)),...
     mf(:,:,1:end-1) );
 
-function retval = dJ_dt(k, F, Ji, h)
-% this is numerical derivative of the mesochronic jacobian
-Ji_step = Ji(:,:,k+1);
+function dJdt = dJ_dt(k, J, Jis, h)
+% Function approximates the numerical derivative of the mesochronic
+% Jacobian.
+%
+% input:
+% k - current step of the iteration
+% J - mesochronic Jacobian evaluated at this step
+% Jis - entire evolution of instantaneous Jacobians
+% h - magnitude of the timestep
+%
+% returns:
+% dJdt - approximate derivative of the mesochronic Jacobian
+
+% instantaneous Jacobian at current step
+Ji = Jis(:,:,k+1);
+
 if k == 0
-    retval = Ji_step * F;
-elseif k > 0
-    retval = (Ji_step-F)/(k*h) + Ji_step * F;
+    dJdt = Ji * J;
 else
-    error('k has to be non-negative')
+    dJdt = (Ji-J)/(k*h) + Ji * J;
 end
 
-function [rhs, lhs] = adamsbashforth
+function [rhs, lhs, maxOrder] = adamsbashforth
 % Adams-Bashforth coefficients (Petzold, Ascher, Linear Multistep,
 %                               table 5.1)
+%
+% This is a "convenience" function, just making it easier
+% to locate where coefficients can be found in case one wants to
+% code up higher order methods.
+%
+% Currently, returns Adams-Bashforth coefficients up to maxorder=6.
+%
+% rhs is a maxorder x maxorder matrix of right-hand-side coefficients
+% lhs is a 1 x maxorder vector of left-hand-side coefficients
+%
+% The reason why the function returns all coefficients, and not only the
+% desired order, is because of initialization:
+% to initialize Nth order, all coefficients of orders of 1 to N-1 are
+% needed, and are used to compute first N-1 steps in the iteration
+% (N-th order needs N initial conditions).
+%
+% To add coefficients of additional order, change maxorder line
+% and then append three lines, e.g.,
+%
+% order=7;
+% rhs(order, 1:order) = ...
+% lhs(order) = ...
+%
+% This is clearly not the most efficient way to define the coefficients,
+% but I found it to be more readable than just having a big matrix.
 
-maxorder = 6;
+% maxorder is implementation dependent, and therefore not a parameter
+maxOrder = 6; rhs = nan(maxOrder,maxOrder);
 
-rhs = nan(maxorder,maxorder);
-lhs = zeros(1,maxorder);
+lhs = zeros(1,maxOrder);
 
 order=1;
 rhs(order, 1:order) = 1;
