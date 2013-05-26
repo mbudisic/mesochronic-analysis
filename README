@@ -24,11 +24,11 @@ recommended), run
 
    deploytool -build mcjacobian.prj
 
-and wait until "Build finished." message. This will convert
-mcjacobian.m to C-code and compile it into mcjacobian_mat MEX. The
-code should detect whether there exists a compiled version and run it;
-if there is no compiled version, the standard Matlab code will be run
-instead.
+before using the code for the first time and wait until "Build
+finished" message. This will convert mcjacobian.m to C-code and
+compile it into mcjacobian_mat MEX. The rest of the code detects
+whether the MEX file exists or not every time meh_simulation.m is run,
+and uses MEX or .mat file appropriately.
 
 For compilation problems, please consult Matlab Coder (not Compiler!)
 compatibility chart: http://www.mathworks.com/support/compilers
