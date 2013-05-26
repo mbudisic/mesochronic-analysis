@@ -102,7 +102,6 @@ if  isempty(mydata)
     end
     
     commonname = 'fourgyre';
-    Ndim = 2;
     
     filename = sprintf('%s_jac_o%d_N%d_%sT_%.1f.mat', commonname, order, N, dirlab, max(T));
     
@@ -120,7 +119,7 @@ if  isempty(mydata)
     
     % analyze Jacobian data using mesohyperbolic analysis
     filename = sprintf('%s_meh_o%d_N%d_%sT_%.1f.mat', commonname, order, N, dirlab, max(T));
-    MCdata = meh_analysis(T, Jdata.Jacobians, Ndim, tol); % 
+    MCdata = meh_analysis(T, Jdata.Jacobians, Jdata.Ndim, tol); % 
     save(filename,'-struct', 'MCdata');
     
     % group evaluations of the Jacobian and mesochronic analysis into the
