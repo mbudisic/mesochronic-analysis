@@ -3,20 +3,18 @@ function d = mindist(v)
 %
 % Compute minimal distance between elements of v.
 
-if ~iscolumn(v)
-    v = v.';
-end
+Nel = numel(v);
+v = v(:);
 
-if max(abs(v)) == 0.
+if max(v) == 0.
+%if all( v == 0 )
     d = 0.;
 else
     % repeat vector to the matrix
-    V = repmat( v, [1, numel(v)]);
+    V = repmat( v, [1, Nel]);
     
-    % pairwise distance between elements
-    D = abs(V - V.');
+    % off-diagonal distances between elements (diagonal is obviously zero)
+    D = triu( abs(V - V.'), 1);
     
-    % minimal off-diagonal distance (diagonal is obviously zero)
-    d = min( D( eye(numel(v)) ~= 1 ) );
-    
+    d = min( D(:) );
 end
