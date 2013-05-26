@@ -19,31 +19,42 @@ supported by ONR MURI N00014-11-1-0087
 
 ** Installation: **
 
-On Matlab 2012b and newer, if faster execution is desired (highly recommended), run
+On Matlab 2012b and newer, if faster execution is desired (highly
+recommended), run
 
    deploytool -build mcjacobian.prj
 
-and wait until "Build finished." message. This will convert mcjacobian.m to
-C-code and compile it into mcjacobian_mat MEX. The code should detect
-whether there exists a compiled version and run it; if there is no compiled
-version, the standard Matlab code will be run instead.
+and wait until "Build finished." message. This will convert
+mcjacobian.m to C-code and compile it into mcjacobian_mat MEX. The
+code should detect whether there exists a compiled version and run it;
+if there is no compiled version, the standard Matlab code will be run
+instead.
 
-For compilation problems, please consult Matlab Coder (not Compiler!) compatibility chart:
-http://www.mathworks.com/support/compilers
+For compilation problems, please consult Matlab Coder (not Compiler!)
+compatibility chart: http://www.mathworks.com/support/compilers
 
-The code is written so it can be run in parallel on Matlab with Parallel Toolbox licenses. To open several "workers" to compute code in parallel, issue command
+The code is written so it can be run in parallel on Matlab with
+Parallel Toolbox licenses. To open several "workers" to compute code
+in parallel, issue command
 
 matlabpool open N
 
-where N is the number of processing cores on your computer (laptops typically have 1-4 nowadays). You can also omit 'N' altogether and issue
+where N is the number of processing cores on your computer (laptops
+typically have 1-4 nowadays). You can also omit 'N' altogether and
+issue
 
 matlabpool open
 
-to have Matlab autodetect the number of cores. Note that they sometimes under-estimate the number of cores available. Setting N to anything larger than number of cores may lead to slowdown of performance. Here's an article by Cleve Moler on this issue, if you want to know more:
+to have Matlab autodetect the number of cores. Note that they
+sometimes under-estimate the number of cores available. Setting N to
+anything larger than number of cores may lead to slowdown of
+performance. Here's an article by Cleve Moler on this issue, if you
+want to know more:
 
 http://www.mathworks.com/company/newsletters/articles/parallel-matlab-multiple-processors-and-multiple-cores.html
 
-There is a well known case of a bug, appearing on Mac OS X with newer versions of Java. You can see how it manifests and how to fix it on
+There is a well known case of a bug, appearing on Mac OS X with newer
+versions of Java. You can see how it manifests and how to fix it on
 
 http://www.mathworks.com/support/bugreports/919688
 
@@ -81,10 +92,10 @@ b) completely do away with simulation meh_simulation.m and
 
 * Main files *
 
-  meh_simulation.m -- Simulation harness: this is the main file that performs
-  simulation of an arbitrary system specified as a
-  function handle and computes mesochronic Jacobian for a
-  specific set of initial conditions and integration times.
+  meh_simulation.m -- Simulation harness: this is the main file that
+  performs simulation of an arbitrary system specified as a function
+  handle and computes mesochronic Jacobian for a specific set of
+  initial conditions and integration times.
 
   This is performed in parallel for initial conditions.
 
@@ -104,8 +115,8 @@ b) completely do away with simulation meh_simulation.m and
   state point and time of a flow specified by a function handle.
 
   mcjacobian.m -- Computes a mesochronic Jacobian from evaluations of
-  			      instantaneous Jacobian along trajectory
-  				  (run by evaluateJ_ode.m)
+  			      instantaneous Jacobian along trajectory (run by
+  			      evaluateJ_ode.m)
 
   ftle.m -- Computes FTLE from mesochronic Jacobian (run by
   meh2d).
