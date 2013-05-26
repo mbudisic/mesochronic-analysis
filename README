@@ -31,6 +31,23 @@ version, the standard Matlab code will be run instead.
 For compilation problems, please consult Matlab Coder (not Compiler!) compatibility chart:
 http://www.mathworks.com/support/compilers
 
+The code is written so it can be run in parallel on Matlab with Parallel Toolbox licenses. To open several "workers" to compute code in parallel, issue command
+
+matlabpool open N
+
+where N is the number of processing cores on your computer (laptops typically have 1-4 nowadays). You can also omit 'N' altogether and issue
+
+matlabpool open
+
+to have Matlab autodetect the number of cores. Note that they sometimes under-estimate the number of cores available. Setting N to anything larger than number of cores may lead to slowdown of performance. Here's an article by Cleve Moler on this issue, if you want to know more:
+
+http://www.mathworks.com/company/newsletters/articles/parallel-matlab-multiple-processors-and-multiple-cores.html
+
+There is a well known case of a bug, appearing on Mac OS X with newer versions of Java. You can see how it manifests and how to fix it on
+
+http://www.mathworks.com/support/bugreports/919688
+
+
 ** Test (demo) system **
 This is a simple planar, time-dependent flow, 
 used as the first example in Mezic, Loire, et al. Science (2010)
