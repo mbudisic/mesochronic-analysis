@@ -84,9 +84,9 @@ output. An end-user would (at first)
 
 a) replace the vector field in fourgyre.m
 
-b) completely do away with simulation meh_simulation.m and 
-   run meh_analysis.m on an alternatively derived 
-   mesochronic Jacobians
+b) replace meh_simulation.m (which computes mesochronic Jacobians
+   data), with another, perhaps more precise, computational code, or
+   even experimental data, and just apply meh_analysis.m to that data.
 
 *** File functionality ***
 
@@ -134,7 +134,7 @@ b) completely do away with simulation meh_simulation.m and
 
   diverging_map.m -- Creates a diverging colormap between 2
   					 colors. Written by Andy Stein based on Kenneth
-  					 Moreland (Sandia) paper:
+  					 Moreland's (Sandia) paper:
   					 http://www.sandia.gov/~kmorel/documents/ColorMaps/
   					 doi:10.1007/978-3-642-10520-3_9
 
