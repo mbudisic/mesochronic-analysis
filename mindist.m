@@ -3,11 +3,9 @@ function d = mindist(v)
 %
 % Compute minimal distance between elements of v.
 
-if ~iscolumn(v)
-    v = v.';
-end
+v = v(:);
 
-if max(abs(v)) == 0.
+if all( v )  == 0.
     d = 0.;
 else
     % repeat vector to the matrix
