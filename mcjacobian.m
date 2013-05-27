@@ -151,6 +151,9 @@ mcJacobians = zeros( sizeOfJacobians(1), ...
 maxStep = Nt-1;
 % step loop - zero indexed, 0 is the initial time (not computed)
 %             maxStep is the final time
+
+dJ_storage = nan( [ sizeOfJacobians, orderUsed ] );
+
 for n = 1:maxStep
     
     % move F a step further, dropping oldest record, and inserting empty to the
@@ -161,17 +164,21 @@ for n = 1:maxStep
     % This way, lower order methods automatically initialize higher ones.
     effectiveOrder = min( [n, orderUsed] ); % effective order
     
-    % form multiplication coefficient
-    coeff = h * abrhs(effectiveOrder, 1:effectiveOrder)/ablhs(effectiveOrder);
+    % select coefficients based on the effective order
+    myrhs = abrhs(effectiveOrder, 1:effectiveOrder);
+    mylhs = ablhs(effectiveOrder);
     
+    
+    coeff = h * myrhs / mylhs;
+    
+    % index 2 is the base step (first in history) based on which we determine value of next step        
     % approximate right hand side of the evolution
-    deltaJ = coeff(1) * dJ_dt(n-1, J_steps(:,:,2), Ji, h);
-    for bstep = 2:effectiveOrder
-        deltaJ = deltaJ + coeff(bstep) * dJ_dt(n-bstep, J_steps(:,:,1+bstep), Ji, h);
+    for bstep = 1:effectiveOrder
+         dJ_storage(:,:,bstep) =  coeff(bstep) * dJ_dt(n-bstep, J_steps(:,:,1+bstep), Ji, h);
     end
-    
+        
     % update jacobian
-    J_steps(:,:,1) = J_steps(:,:,2) + deltaJ;
+    J_steps(:,:,1) = J_steps(:,:,2) + sum(dJ_storage(:,:, 1:effectiveOrder),3);
     
     % detect a saving step
     [~,savestep] = ismember(n, mcStepsRequested);
