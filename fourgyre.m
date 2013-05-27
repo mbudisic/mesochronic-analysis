@@ -1,4 +1,4 @@
-function retval = fourgyre(mydata, T, N, direction)
+function mydata = fourgyre(mydata, T, N, direction)
 % retval = fourgyre(mydata, T, N, direction)
 %
 % A demo run for four gyre flow - simulation and visualization.
@@ -132,7 +132,6 @@ if  isempty(mydata)
     filename = sprintf('%s_o%d_N%d_%sT_%.1f.mat', commonname, order, N, dirlab, max(T));
     save(filename,'-struct', 'mydata');
     
-    retval = mydata;
 else
 
 %% PLOTTING
