@@ -83,17 +83,13 @@ if  isempty(mydata)
     tol = 1e-3; % tolerance on zero-matching criteria (irrelevant for 2d analysis)
     t0 = 0; % initial time
     
+    epsilon = 0.1; % perturbation magnitude for the simulated flow
+    
     % determine the grid of inital conditions
     icgrid = linspace(0,1,N);
     [X,Y] = meshgrid( icgrid, icgrid);
     ics = [X(:), Y(:)];
-    
-    % specification of the system
-    epsilon = 0.1;
-    f = @(t,x)[...
-        -sin(2*pi*x(1,:)) .* cos(2*pi*x(2,:)) + epsilon*cos(2*pi*t) .* cos(2*pi*x(1,:)) .* sin(2*pi*x(2,:));...
-        cos(2*pi*x(1,:)) .* sin(2*pi*x(2,:)) - epsilon*cos(2*pi*t) .* sin(2*pi*x(1,:)) .* cos(2*pi*x(2,:)) ];
-        
+            
     % form the filename for saving the a Jacobians
     if direction > 0
         dirlab = 'fwd';
@@ -112,8 +108,8 @@ if  isempty(mydata)
         
     % if file does not exist, simulate the system
     else
-        disp(['Simulating ' filename]);
-        Jdata = meh_simulation(f, t0, T, direction, 'ode', ics, h, dp, order, tol);
+        disp(['Simulating ' filename]);        
+        Jdata = meh_simulation(@(t,x)vf_fourgyre(t,x,epsilon), t0, T, direction, 'ode', ics, h, dp, order, tol);
         save(filename,'-struct', 'Jdata');
     end
     
@@ -137,10 +133,9 @@ if  isempty(mydata)
     save(filename,'-struct', 'mydata');
     
     retval = mydata;
-end
+else
 
 %% PLOTTING
-if nargout == 0
     disp('Plotting the output.')
     
     % determine the initial condition grid from passed data
