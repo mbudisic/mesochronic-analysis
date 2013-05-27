@@ -139,16 +139,15 @@ experimental data, and just applying meh_analysis.m to that data.
   mehcolor.m -- Creates a colormap for visualization of 2d mesochronic
   classes using values of determinant.
 
-  diverging_map.m -- Creates a diverging colormap between 2
-  					 colors. Written by Andy Stein based on Kenneth
-  					 Moreland's (Sandia) paper:
-  					 http://www.sandia.gov/~kmorel/documents/ColorMaps/
-  					 doi:10.1007/978-3-642-10520-3_9
+  diverging_map.m -- Creates a diverging colormap between 2 colors. 
+Written by Andy Stein based on Kenneth Moreland's (Sandia) paper: 
+http://www.sandia.gov/~kmorel/documents/ColorMaps/ 
+doi:10.1007/978-3-642-10520-3_9
 
 * Additional files *
 
-  mcjacobian.prj -- Matlab Coder Project file, used to compile
-  				    mcjacobian.m into a fast compiled code.
+  mcjacobian.prj -- Matlab Coder Project file, used to compile 
+mcjacobian.m into a fast compiled code.
 
 Copyright (c) 2013, Regents of the University of California All rights
 reserved.
