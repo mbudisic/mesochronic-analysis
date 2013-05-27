@@ -11,10 +11,16 @@ else
     % repeat vector to the matrix
     V = repmat( v, [1, numel(v)]);
     
-    % pairwise distance between elements
-    D = abs(V - V.');
-    
-    % minimal off-diagonal distance (diagonal is obviously zero)
-    d = min( D( eye(numel(v)) ~= 1 ) );
-    
+    % pairwise distance between elements - 
+    % need only nonzero elements from upper triangular part,
+    % as matrix is symmetric, and diagonal always contains zeros
+    D = nonzeros( triu( abs(V - V.'), 1 ) );
+
+    % minimal off-diagonal distance 
+    if isempty(D)
+        d = 0;
+    else
+        d = min(D);
+    end
+        
 end
