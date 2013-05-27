@@ -41,7 +41,7 @@ matlabpool open N
 
 where N is the number of processing cores on your computer (laptops
 typically have 1-4 nowadays). You can also omit 'N' altogether and
-issue
+issue just
 
 matlabpool open
 
