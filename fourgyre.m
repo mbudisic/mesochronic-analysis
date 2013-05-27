@@ -275,7 +275,7 @@ colorbar
 try
     colormap morgenstemning
 catch
-    disp('Download "morgenstemning" color scheme from MATLAB Central (google: colormap morgenstemning) for grayscale-compatible colors ;)');
+    disp('Default color scheme "morgenstemning" missing. Download it from MATLAB Central (google: colormap morgenstemning). Using "hot" instead.');
     colormap hot
 end
 set(gca, 'XTick', (0:0.25:1))
@@ -285,7 +285,6 @@ xlabel('x [\pi]')
 ylabel('y [\pi]')
 
 if exist('fulldata','var')
-    disp('Normalizing axes')
     caxis( prctile(fulldata(:), [1, 99]) );
     retval = prctile(fulldata(:), [1, 99]);
 end
