@@ -1,6 +1,5 @@
 ** Mesochronic Analysis Toolbox ** 
 
-
 This is a Matlab toolbox intented to demonstrate the principles behind
 2d mesochronic analyses for incompressible dynamical systems.
 
@@ -26,9 +25,8 @@ recommended), run
 
 before using the code for the first time and wait until "Build
 finished" message. This will convert mcjacobian.m to C-code and
-compile it into mcjacobian_mat MEX. The rest of the code detects
-whether the MEX file exists or not every time meh_simulation.m is run,
-and uses MEX or .mat file appropriately.
+compile it into mcjacobian_mat MEX. Function evaluateJ_ode.m detects
+whether the MEX file exists and uses MEX or .mat file appropriately.
 
 For compilation problems, please consult Matlab Coder (not Compiler!)
 compatibility chart: http://www.mathworks.com/support/compilers
@@ -59,9 +57,13 @@ versions of Java. You can see how it manifests and how to fix it on
 http://www.mathworks.com/support/bugreports/919688
 
 
-** Test (demo) system **
-This is a simple planar, time-dependent flow, 
-used as the first example in Mezic, Loire, et al. Science (2010)
+** Test (demo) system ** 
+
+This is a simple planar, time-dependent flow, used as the first
+example in Mezic, Loire, et al. Science (2010). The function
+fourgyre.m was written with intention of being mimicked by other
+researchers in their researcn, not as being the optimally written
+harness for others to use.p
 
 Demo: fourgyre.m
 
@@ -80,13 +82,16 @@ fourgyre(R, 1, N, direction)
 
 The demonstration is a sample short-time run, just to evaluate that
 the code runs validly and to familiarize the user with inputs and
-output. An end-user would (at first)
+output. Once you are comfortable with the structure, you could
 
-a) replace the vector field in fourgyre.m
+a) replace the vector field vf_fourgyre passed in fourgyre.m to
+meh_simulation.m with an alternative vector field. As a practice
+field, the file vf_shaddengyre can be used.
 
-b) replace meh_simulation.m (which computes mesochronic Jacobians
-   data), with another, perhaps more precise, computational code, or
-   even experimental data, and just apply meh_analysis.m to that data.
+b) Mimic the structure of fourgyre.m to produce your own code, e.g.,
+replacing meh_simulation.m (which computes mesochronic Jacobians
+data), with another, perhaps more precise, computational code, or even
+experimental data, and just applying meh_analysis.m to that data.
 
 *** File functionality ***
 
@@ -111,12 +116,14 @@ b) replace meh_simulation.m (which computes mesochronic Jacobians
 
 * Computational aides *
 
+  vf_fourgyre.m and vf_shaddengyre.m -- Two simple 2d incompressible
+  vector fields.
+
   evaluateJ_ode.m -- Evaluates the mesochronic Jacobian at a given
   state point and time of a flow specified by a function handle.
 
   mcjacobian.m -- Computes a mesochronic Jacobian from evaluations of
-  			      instantaneous Jacobian along trajectory (run by
-  			      evaluateJ_ode.m)
+  instantaneous Jacobian along trajectory (run by evaluateJ_ode.m)
 
   ftle.m -- Computes FTLE from mesochronic Jacobian (run by
   meh2d).
