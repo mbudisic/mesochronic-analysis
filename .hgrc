@@ -1,0 +1,3 @@
+[hooks]
+pretxnchangegroup.branch = hg heads --template '{branches} '
+
