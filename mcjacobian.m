@@ -152,7 +152,9 @@ maxStep = Nt-1;
 % step loop - zero indexed, 0 is the initial time (not computed)
 %             maxStep is the final time
 
-dJ_storage = nan( [ sizeOfJacobians, orderUsed ] );
+dJ_storage = zeros( sizeOfJacobians(1), ...
+                    sizeOfJacobians(2), ...
+                    orderUsed);
 
 for n = 1:maxStep
     
@@ -169,16 +171,16 @@ for n = 1:maxStep
     mylhs = ablhs(effectiveOrder);
     
     
-    coeff = h * myrhs / mylhs;
+    coeff = myrhs / mylhs;
     
     % index 2 is the base step (first in history) based on which we determine value of next step        
     % approximate right hand side of the evolution
     for bstep = 1:effectiveOrder
          dJ_storage(:,:,bstep) =  coeff(bstep) * dJ_dt(n-bstep, J_steps(:,:,1+bstep), Ji, h);
     end
-        
+            
     % update jacobian
-    J_steps(:,:,1) = J_steps(:,:,2) + sum(dJ_storage(:,:, 1:effectiveOrder),3);
+    J_steps(:,:,1) = J_steps(:,:,2) + h*sum(dJ_storage(:,:, 1:effectiveOrder),3);
     
     % detect a saving step
     [~,savestep] = ismember(n, mcStepsRequested);
