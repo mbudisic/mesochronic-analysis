@@ -19,7 +19,7 @@ function retval = meh_simulation(f, t0, Ts, direction, method, ics, h, dp, order
 % ics - Npoints x D list of initial conditions, where D is dimension of state
 %       space (2 or 3)
 % h - discretization of time
-% dp - finite difference variation (for instantaneous Jacobian evaluation)
+% dp - finite difference variation (for instantaneous Jacobian evaluation, 1e-6 is a good guess)
 % order - order of Adams-Bashforth
 %         -1 for highest possible Adams-Bashforth method (currently 6),
 %          1-6 for appropriate order of Adams-Bashforth

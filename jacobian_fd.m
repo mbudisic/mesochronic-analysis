@@ -9,6 +9,10 @@ function Ji = jacobian_fd(f, t, y, dp)
 % y - Npoints x Ndim matrix of states
 % dp - finite variation
 %
+% Returns:
+% Ji - Ndim x Ndim x Npoints matrix
+%
+%
 % optimal delta is 
 % dp = ( 3 * eps * norm(f) / 2 norm( d^3 f )  )^(1/3)
 % where norm(f) is infty-bound on values of f
@@ -25,7 +29,7 @@ Ndim = size(y,2);
 Ji = zeros(Ndim,Ndim,Npoints);
 
 % variations
-p_var = kron( eye(Ndim), [1,-1]) * dp; % Ndim x 2Ndim
+p_var = kron( eye(Ndim), [.5,-.5]) * dp; % Ndim x 2Ndim
 
 % evaluate Jacobian point by point - this can probably be vectorized
 for k = 1:Npoints
@@ -39,7 +43,7 @@ for k = 1:Npoints
         f_var(:,n) = f( t_p, point + p_var(:,n) );
     end
     
-    Ji(:, :, k) = ( f_var(:,1:2:end) - f_var(:,2:2:end) )/(2*dp);
+    Ji(:, :, k) = ( f_var(:,1:2:end) - f_var(:,2:2:end) )/dp;
 end
 
 

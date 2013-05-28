@@ -79,7 +79,7 @@ if  isempty(mydata)
     
     order = 2; % use 2nd order - safest before I check whether there are finite-precision errors in higher orders
     h = 1e-2; % uniform timestep
-    dp = 1e-8; % spatial step for finite difference evaluation of inst. Jacobian
+    dp = 1e-6; % spatial step for finite difference evaluation of inst. Jacobian
     tol = 1e-3; % tolerance on zero-matching criteria (irrelevant for 2d analysis)
     t0 = 0; % initial time
     
