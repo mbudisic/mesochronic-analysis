@@ -6,6 +6,7 @@ function retval = meh_analysis(T, Jacobians, Ndim, tol)
 % T - vector of lengths of integration periods (length K)
 % Jacobians - cell array of Ndim x Ndim x K or 3x3xK
 % Ndim - dimension of state space, 2 or 3
+% tol - tolerance for zero-matching criteria (1e-3 is a good value)
 
 % set up output storage structures
 Npoints = numel(Jacobians);
