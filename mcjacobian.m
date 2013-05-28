@@ -180,7 +180,13 @@ for n = 1:maxStep
     end
             
     % update jacobian
-    J_steps(:,:,1) = J_steps(:,:,2) + h*sum(dJ_storage(:,:, 1:effectiveOrder),3);
+    S_matlab = sum(h*dJ_storage(:,:, 1:effectiveOrder),3); % plain summation
+    
+%   kahan
+%   summation - for debugging purposes only    
+%   S_kahan = matrixKahanSum(h*dJ_storage(:,:, 1:effectiveOrder)); 
+
+    J_steps(:,:,1) = J_steps(:,:,2) + S_matlab;
     
     % detect a saving step
     [~,savestep] = ismember(n, mcStepsRequested);
@@ -223,6 +229,28 @@ if k == 0
 else
     dJdt = (Ji-J)/(k*h) + Ji * J;
 end
+
+function S = matrixKahanSum( M )
+% S = matrixKahanSum( M )
+%
+% Kahan summation for matrices, over 3rd dimension
+%
+% This summation compensates for finite-precision roundoff effects (but not
+% for overflow).
+%
+
+S = zeros( size(M,1), size(M,2) ); % result
+c = zeros( size(M,1), size(M,2) ); % compensation
+
+N = size(M,3);
+
+for i = 1:N
+   y = M(:,:,i) - c;
+   T = S + y;
+   c = (T - S) - y;
+   S = T;
+end
+
 
 function [rhs, lhs, maxOrder] = adamsbashforth
 % Adams-Bashforth coefficients (Petzold, Ascher, Linear Multistep,
