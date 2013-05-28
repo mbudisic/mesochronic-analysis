@@ -1,5 +1,5 @@
-function retval = meh_simulation(f, t0, T, direction, method, ics, h, dp, order, tol)
-% meh_simulation(f, t0, T, direction, method, ics, h, dp, order, tol,  name)
+function retval = meh_simulation(f, t0, Ts, direction, method, ics, h, dp, order, tol)
+% retval = meh_simulation(f, t0, Ts, direction, method, ics, h, dp, order, tol)
 %
 % Compute mesochronic analysis of a dynamical system given by
 % the vector field f under assumption of incompressibility.
@@ -25,6 +25,11 @@ function retval = meh_simulation(f, t0, T, direction, method, ics, h, dp, order,
 %          1-6 for appropriate order of Adams-Bashforth
 % tol - tolerance on evaluating zero-matching criteria (currently only for
 %       3d)
+%
+% returns:
+% retval - structure with parameters of the method
+%          and a field Jacobians containing mesochronic Jacobians
+%          computed at intervals contained in input Ts
 %
 %
 % Open matlabpool before running if parallel computation is desired.
@@ -64,7 +69,7 @@ Jacobians = cell(Npoints,1);
 % output structure
 retval = struct;
 retval.ics = ics;
-retval.T  = T;
+retval.T  = Ts;
 retval.t0 = t0;
 retval.h = h;
 retval.dp = dp;
@@ -88,13 +93,13 @@ parfor k = 1:Npoints
     
     % Adams-Bashforth evolution methods
     if strcmpi(method,'ode')
-        [mJ,~,myorder] = evaluateJ_ode( order, ic, f, t0, T, direction, h, dp );
+        [mJ,~,myorder] = evaluateJ_ode( order, ic, f, t0, Ts, direction, h, dp );
         orderlist(k) = myorder;
         
     % direct finite-difference method
     else
         orderlist(k) = 0;
-        mJ = evaluateJ_fd( ic, f, T, h, dp );
+        mJ = evaluateJ_fd( ic, f, Ts, h, dp );
     end
     
     % store the output
