@@ -69,6 +69,8 @@ harness for others to use.p
 
 Demo: fourgyre.m
 
+****
+
 % open parallel jobs (in serial, the code takes a few minutes to run)
 matlabpool open; % 
 
@@ -81,6 +83,8 @@ R = fourgyre([], Ts, N, direction)
 
 % visualize output for T=1
 fourgyre(R, 1, N, direction) 
+
+****
 
 The demonstration is a sample short-time run, just to evaluate that
 the code runs validly and to familiarize the user with inputs and
