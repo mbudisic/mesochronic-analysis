@@ -1,7 +1,9 @@
 ** Mesochronic Analysis Toolbox ** 
 
 This is a Matlab toolbox intented to demonstrate the principles behind
-2d mesochronic analyses for incompressible dynamical systems.
+2d mesochronic analyses for incompressible dynamical systems. The
+toolbox has been tested with Matlab 2012b and newer. It will not run
+correctly on Matlab 2011b and earlier.
 
 I would appreciate your feedback sent to
 mbudisic@engr.ucsb.edu 
