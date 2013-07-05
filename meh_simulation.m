@@ -115,6 +115,7 @@ parfor k = 1:Npoints
         myJi = sol.Ji;
         myfi = sol.fi;
         [stretch, shear] = halleriacono_mex(h, myJi, myfi);
+        
         hi_stretch(k,:) = stretch(retstep);
         hi_shear(k,:) = shear(retstep);
     end

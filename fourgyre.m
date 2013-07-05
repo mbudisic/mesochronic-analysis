@@ -117,7 +117,7 @@ if  isempty(mydata)
     filename = sprintf('%s_meh_o%d_N%d_%sT_%.1f.mat', commonname, order, N, dirlab, max(T));
     MCdata = meh_analysis(T, Jdata.Jacobians, Jdata.Ndim, tol); %
     
-    save(filename,'-struct', 'MCdata', 'hi_stretch', 'hi_shear');
+    save(filename,'-struct', 'MCdata');
     
     % group evaluations of the Jacobian and mesochronic analysis into the
     % same data set

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <deployment-project plugin="plugin.matlabcoder" plugin-version="R2013a">
-  <configuration target="target.matlab.coder" target-name="MEX, C, and C++ Code Generation" name="mcjacobian" location="/Users/mbudisic/Work/MatlabToolbox/meh" file="/Users/mbudisic/Work/MatlabToolbox/meh/mcjacobian.prj" build-checksum="249155123">
+  <configuration target="target.matlab.coder" target-name="MEX, C, and C++ Code Generation" name="mcjacobian" location="/Users/mbudisic/Work/MatlabToolbox/meh" file="/Users/mbudisic/Work/MatlabToolbox/meh/mcjacobian.prj" build-checksum="3291004554">
     <profile key="profile.mex">
       <param.MergeInstrumentationResults>false</param.MergeInstrumentationResults>
       <param.BuiltInstrumentedMex>false</param.BuiltInstrumentedMex>
@@ -453,7 +453,7 @@
       <vista>false</vista>
       <linux>false</linux>
       <solaris>false</solaris>
-      <osver>10.8.3</osver>
+      <osver>10.8.4</osver>
       <os32>false</os32>
       <os64>true</os64>
       <arch>maci64</arch>
