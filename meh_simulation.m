@@ -11,7 +11,7 @@ function retval = meh_simulation(f, t0, Ts, direction, method, ics, h, dp, order
 %     its vectorized analogue would be
 %     f = @(t,x)[ -x(2,:); x(1,:) ]
 % t0 - initial time
-% T - vector of *positive* integration periods
+% Ts - vector of *positive* integration periods
 % direction - direction of integration; positive for forward, negative for
 %             backward
 % method - method of evaluating mesochronic Jacobian
@@ -66,6 +66,11 @@ end
 Npoints = size(ics,1);
 Jacobians = cell(Npoints,1);
 
+% storage for quantifiers other than mesochronic Jacobian
+if Ndim == 2
+    halleriacono = cell(Npoints,1);
+end
+
 % output structure
 retval = struct;
 retval.ics = ics;
@@ -93,7 +98,7 @@ parfor k = 1:Npoints
     
     % Adams-Bashforth evolution methods
     if strcmpi(method,'ode')
-        [mJ,~,myorder] = evaluateJ_ode( order, ic, f, t0, Ts, direction, h, dp );
+        [mJ, retstep, sol, myorder] = evaluateJ_ode( order, ic, f, t0, Ts, direction, h, dp );
         orderlist(k) = myorder;
         
     % direct finite-difference method
@@ -105,8 +110,18 @@ parfor k = 1:Npoints
     % store the output
     Jacobians{k} = mJ;
     
+    if Ndim == 2
+        myJi = sol.Ji;
+        myfi = sol.fi;
+        [stretch, shear] = halleriacono_mex(h, myJi, myfi);
+        halleriacono{k} = [ stretch(retstep); shear(retstep)];
+    end
+    
 end
 
 % set the overall order to the lowest order used by computation
 retval.order = min(orderlist);
 retval.Jacobians = Jacobians;
+if Ndim == 2
+    retval.halleriacono = halleriacono;
+end
