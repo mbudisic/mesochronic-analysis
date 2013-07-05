@@ -1,4 +1,4 @@
-function Ji = jacobian_fd(f, t, y, dp)
+function [Ji, fi] = jacobian_fd(f, t, y, dp)
 % JACOBIAN_FD(f, t, y, dp)
 %
 % Evaluate the instantaneous jacobian by central finite difference
@@ -45,6 +45,9 @@ for k = 1:Npoints
     
     Ji(:, :, k) = ( f_var(:,1:2:end) - f_var(:,2:2:end) )/dp;
 end
+
+% evaluate vector field
+fi = f(t_p, y.');
 
 
 

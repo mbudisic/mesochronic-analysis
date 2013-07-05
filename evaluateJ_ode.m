@@ -1,4 +1,4 @@
-function [mJ, sol, order] = evaluateJ_ode( order, ic, f, t0, T, direction, h, dp )
+function [mJ, retstep, sol, order] = evaluateJ_ode( order, ic, f, t0, T, direction, h, dp )
 % EVALUATEJ_ODE( order, ic, f, t0, T, h, dp )
 %
 % Evaluate mesochronic Jacobian using ODE evolution.
@@ -42,16 +42,18 @@ sol.x = yout;
 
 assert( norm( t - tout.', Inf) < 1e-12, 'Output times do not match input times');
 
-
 % evaluate Jacobian using finite differences
-Ji = jacobian_fd(fsim, tout, yout, dp);
+[Ji, fi] = jacobian_fd(fsim, tout, yout, dp);
+
+sol.Ji = Ji;
+sol.fi = fi;
 
 % return steps are multiples of resampling interval
 retstep = fix(T/h);
 
 % solve the Jacobian equation
 try
-    [mJ, ~, order] = mcjacobian_mex(h, Ji, retstep, order);
+    [mJ, ~, order] = mcjacobian_mex(h, Ji, retstep, order);    
 catch
     
     if verLessThan('matlab', '8')
