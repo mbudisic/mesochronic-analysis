@@ -137,7 +137,7 @@ end
 % take the mod of retstep to rewrap
 assert(isvector(mcStepsRequested), 'mcStepsRequested has to be a vector');
 mcStepsRequested = mod(mcStepsRequested, Nt);
-mcStepsRequested = unique(mcStepsRequested);
+mcStepsRequested = unique(mcStepsRequested)+1; % +1 for zero-indexed 
 
 numberOfStepsRequested = length(mcStepsRequested);
 

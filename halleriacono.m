@@ -62,6 +62,6 @@ stretch = - cumsum( Spar )*h;
 lambda_bwd = - cumsum( Spar(end:-1:1) ) * h;
 lambda_bwd = lambda_bwd(end:-1:1);
 
-shear = sum( exp(-2*lambda_bwd) .* Scir )*h;
+shear = cumsum( exp(-2*lambda_bwd) .* Scir )*h;
 
     
