@@ -135,7 +135,7 @@ if isempty(mcStepsRequested)
 end
 
 % take the mod of retstep to rewrap
-assert(isvector(mcStepsRequested), 'retstep has to be a vector');
+assert(isvector(mcStepsRequested), 'mcStepsRequested has to be a vector');
 mcStepsRequested = mod(mcStepsRequested, Nt);
 mcStepsRequested = unique(mcStepsRequested);
 
