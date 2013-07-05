@@ -68,7 +68,8 @@ Jacobians = cell(Npoints,1);
 
 % storage for quantifiers other than mesochronic Jacobian
 if Ndim == 2
-    halleriacono = cell(Npoints,1);
+    hi_stretch = zeros(Npoints,length(Ts));
+    hi_shear = zeros(Npoints,length(Ts));
 end
 
 % output structure
@@ -114,7 +115,8 @@ parfor k = 1:Npoints
         myJi = sol.Ji;
         myfi = sol.fi;
         [stretch, shear] = halleriacono_mex(h, myJi, myfi);
-        halleriacono{k} = [ stretch(retstep); shear(retstep)];
+        hi_stretch(k,:) = stretch(retstep);
+        hi_shear(k,:) = shear(retstep);
     end
     
 end
@@ -123,5 +125,6 @@ end
 retval.order = min(orderlist);
 retval.Jacobians = Jacobians;
 if Ndim == 2
-    retval.halleriacono = halleriacono;
+    retval.hi_stretch = hi_stretch;
+    retval.hi_shear = hi_shear;
 end
