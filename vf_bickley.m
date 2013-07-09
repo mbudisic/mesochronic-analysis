@@ -6,5 +6,5 @@ function uv = vf_bickley(t, p )
 x = p(1,:);
 y = p(2,:);
 
-uv = [ sech(2*pi*x) .^ 2;...
-       zeros(size(y)) ];
+uv = [ sech(2*pi*y) .^ 2;...
+       zeros(size(x)) ];
