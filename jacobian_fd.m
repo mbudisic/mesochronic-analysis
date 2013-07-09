@@ -11,7 +11,7 @@ function [Ji, fi] = jacobian_fd(f, t, y, dp)
 %
 % Returns:
 % Ji - Ndim x Ndim x Npoints matrix
-%
+% fi - Ndim x Npoints
 %
 % optimal delta is 
 % dp = ( 3 * eps * norm(f) / 2 norm( d^3 f )  )^(1/3)
@@ -27,6 +27,7 @@ Ndim = size(y,2);
 
 % output matrix
 Ji = zeros(Ndim,Ndim,Npoints);
+fi = zeros(Ndim, Npoints);
 
 % variations
 p_var = kron( eye(Ndim), [.5,-.5]) * dp; % Ndim x 2Ndim
@@ -37,17 +38,19 @@ for k = 1:Npoints
     t_p = t(k);
     point = y(k,:).';
     
+    fi(:,k) = f(t_p, point); % evaluate vector field at trajectory point
+    
     f_var = zeros(size(p_var));
     
+    % evalute vector field at a stencil centered at trajectory point
     for n = 1:2*Ndim
         f_var(:,n) = f( t_p, point + p_var(:,n) );
     end
     
+    % compute finite variation
     Ji(:, :, k) = ( f_var(:,1:2:end) - f_var(:,2:2:end) )/dp;
 end
 
-% evaluate vector field
-fi = f(t_p, y.');
 
 
 
