@@ -49,7 +49,7 @@ sol.Ji = Ji;
 sol.fi = fi;
 
 % return steps are multiples of resampling interval
-retstep = ceil(T/h);
+retstep = fix(T/h);
 
 % solve the Jacobian equation
 try
