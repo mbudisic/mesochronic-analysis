@@ -84,8 +84,9 @@ if  isempty(mydata)
     t0 = 0; % initial time
         
     % determine the grid of inital conditions
-    icgrid = linspace(-0.5,0.5,N);
-    [X,Y] = meshgrid( icgrid, icgrid);
+    icgridx = linspace(0,20,N);
+    icgridy = linspace(-4,4,N);
+    [X,Y] = meshgrid( icgridx, icgridy);
     ics = [X(:), Y(:)];
             
     % form the filename for saving the a Jacobians
@@ -107,7 +108,7 @@ if  isempty(mydata)
     % if file does not exist, simulate the system
     else
         disp(['Simulating ' filename]);        
-        Jdata = meh_simulation(@(t,x)vf_bickley(t,x), t0, T, direction, 'ode', ics, h, dp, order, tol);
+        Jdata = meh_simulation(@(t,x)vf_polarjet(t,x), t0, T, direction, 'ode', ics, h, dp, order, tol);
         save(filename,'-struct', 'Jdata');
     end
     
