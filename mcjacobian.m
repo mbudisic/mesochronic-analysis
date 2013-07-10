@@ -136,8 +136,10 @@ end
 
 % take the mod of retstep to rewrap
 assert(isvector(mcStepsRequested), 'mcStepsRequested has to be a vector');
-mcStepsRequested = mod(mcStepsRequested, Nt);
-mcStepsRequested = unique(mcStepsRequested)+1; % +1 for zero-indexed 
+mcStepsRequested = mod(mcStepsRequested, Nt); 
+mcStepsRequested = unique(mcStepsRequested); 
+
+assert( min(mcStepsRequested) >= 0 && max(mcStepsRequested) <= Nt-1, 'Requested steps have to be between 0 and Nt-1')
 
 numberOfStepsRequested = length(mcStepsRequested);
 
@@ -156,7 +158,8 @@ dJ_storage = zeros( sizeOfJacobians(1), ...
                     sizeOfJacobians(2), ...
                     orderUsed);
 
-for n = 1:maxStep
+                
+for n = 1:maxStep % start at second step
     
     % move F a step further, dropping oldest record, and inserting empty to the
     % front
@@ -170,13 +173,12 @@ for n = 1:maxStep
     myrhs = abrhs(effectiveOrder, 1:effectiveOrder);
     mylhs = ablhs(effectiveOrder);
     
-    
     coeff = myrhs / mylhs;
     
     % index 2 is the base step (first in history) based on which we determine value of next step        
     % approximate right hand side of the evolution
     for bstep = 1:effectiveOrder
-         dJ_storage(:,:,bstep) =  coeff(bstep) * dJ_dt(n-bstep, J_steps(:,:,1+bstep), Ji, h);
+         dJ_storage(:,:,bstep) =  coeff(bstep) * dJ_dt(n-bstep, J_steps(:,:,1+bstep), Ji, h); % J_steps(:,:,1) holds the 'next' result
     end
             
     % update jacobian
@@ -213,7 +215,7 @@ function dJdt = dJ_dt(k, J, Jis, h)
 % Jacobian.
 %
 % input:
-% k - current step of the iteration
+% k - current step of the iteration (zero-based)
 % J - mesochronic Jacobian evaluated at this step
 % Jis - entire evolution of instantaneous Jacobians
 % h - magnitude of the timestep
