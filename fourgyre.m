@@ -266,8 +266,43 @@ else
         disp('No Compr field (numerical compressibility) available')
     end
     
+
+    
+    % Haller-Iacono shear
+    if isfield(mydata,'hi_shear')
+        n = n+1; figure(n);
+        pcolor(X,Y, reshape( signedlog10(mydata.hi_shear(:,ind)), [N,N]));
+        setaxes(signedlog10(mydata.hi_shear(:,ind)));
+        colormap(diverging_map(linspace(0,1,64), [0.7,0,0],[0,0,0.7]))
+        cb = findobj(gcf,'tag','Colorbar');title(cb,'sign(x)  log_{10}(1+|x|)')
+        titleline=['Haller-Iacono shear' tstampline];
+        title(titleline)
+        set(gcf,'name',titleline);
+        
+    else
+        disp('No hi_shear field (Haller-Iacono shear) available')
+    end
+    
+    % Haller-Iacono stretch
+    if isfield(mydata,'hi_stretch')
+        n = n+1; figure(n);
+        pcolor(X,Y, reshape( mydata.hi_stretch(:,ind), [N,N]));
+        setaxes(mydata.hi_stretch(:,ind));
+        colormap(diverging_map(linspace(0,1,64), [0.7,0,0],[0,0,0.7]))
+        cb = findobj(gcf,'tag','Colorbar');
+        titleline=['Haller-Iacono stretch' tstampline];
+        title(titleline)
+        set(gcf,'name',titleline);
+        
+    else
+        disp('No hi_stretch field (Haller-Iacono stretch) available')
+    end
+    
 end
 
+function v = signedlog10( u )
+
+v = log10( 1 + abs(u) ) .* sign(u);
 %%
 function retval = setaxes(fulldata)
 % Helper function for setting axes appropriately

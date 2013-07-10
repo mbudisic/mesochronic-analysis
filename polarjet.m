@@ -1,5 +1,5 @@
-function mydata = bickley(mydata, T, N, direction)
-% retval = bickley(mydata, T, N, direction)
+function mydata = polarjet(mydata, T, N, direction)
+% retval = polarjet(mydata, T, N, direction)
 %
 % A demo run for linear Bickley jet flow - simulation and visualization.
 %
@@ -96,7 +96,7 @@ if  isempty(mydata)
         dirlab = 'bwd';
     end
     
-    commonname = 'bickley';
+    commonname = 'polarjet';
     
     filename = sprintf('%s_jac_o%d_N%d_%sT_%.1f.mat', commonname, order, N, dirlab, max(T));
     
@@ -181,7 +181,7 @@ else
     % Mesochronic Classes
     n = 1;
     figure(n)
-    pcolor(X,Y, reshape( mydata.Dets(:,ind), [N,N]));
+    pcolor(X,Y, reshape( signedlog10(mydata.Dets(:,ind)), [N,N]));
     setaxes;
     [cm, crange] = mehcolor(T, 64);
     
@@ -249,23 +249,44 @@ else
         disp('No NonDefect field (deviation from defective Jacobian) available')
     end
     
+
     
-    % Numerical Compressibility (quantifies error in computation of
-    % Jacobian)
-    if isfield(mydata,'Compr')
+    
+    % Haller-Iacono shear
+    if isfield(mydata,'hi_shear')
         n = n+1; figure(n);
-        pcolor(X,Y, reshape( log10(abs(mydata.Compr(:,ind))), [N,N]));
-        setaxes(log10(abs(mydata.Compr(:,ind))));
-        cb = findobj(gcf,'tag','Colorbar');title(cb,'log_{10}')
-        titleline=['Numerical compressibility' tstampline];
+        pcolor(X,Y, reshape( signedlog10(mydata.hi_shear(:,ind)), [N,N]));
+        setaxes(signedlog10(mydata.hi_shear(:,ind)));
+        colormap(diverging_map(linspace(0,1,64), [0.7,0,0],[0,0,0.7]))
+        cb = findobj(gcf,'tag','Colorbar');title(cb,'sign(x)  log_{10}(1+|x|)')
+        titleline=['Haller-Iacono shear' tstampline];
         title(titleline)
         set(gcf,'name',titleline);
         
     else
-        disp('No Compr field (numerical compressibility) available')
+        disp('No hi_shear field (Haller-Iacono shear) available')
+    end
+    
+    % Haller-Iacono stretch
+    if isfield(mydata,'hi_stretch')
+        n = n+1; figure(n);
+        pcolor(X,Y, reshape( mydata.hi_stretch(:,ind), [N,N]));
+        setaxes(mydata.hi_stretch(:,ind));
+        colormap(diverging_map(linspace(0,1,64), [0.7,0,0],[0,0,0.7]))
+        cb = findobj(gcf,'tag','Colorbar');
+        titleline=['Haller-Iacono stretch' tstampline];
+        title(titleline)
+        set(gcf,'name',titleline);
+        
+    else
+        disp('No hi_stretch field (Haller-Iacono stretch) available')
     end
     
 end
+
+function v = signedlog10( u )
+
+v = log10( 1 + abs(u) ) .* sign(u);
 
 %%
 function retval = setaxes(fulldata)
