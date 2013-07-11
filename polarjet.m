@@ -77,7 +77,7 @@ function mydata = polarjet(mydata, T, N, direction)
 %% SIMULATION
 if  isempty(mydata)
     
-    order = 2; % use 2nd order - safest before I check whether there are finite-precision errors in higher orders
+    order = 3; % use 3rd order - safest before I check whether there are finite-precision errors in higher orders
     h = 1e-2; % uniform timestep
     dp = 1e-6; % spatial step for finite difference evaluation of inst. Jacobian
     tol = 1e-3; % tolerance on zero-matching criteria (irrelevant for 2d analysis)
@@ -222,8 +222,8 @@ else
     % Deviation from a normal jacobian
     if isfield(mydata,'NonNml')
         n = n+1; figure(n);
-        pcolor(X,Y, reshape( log10(mydata.NonNml(:,ind)), [N,N]));
-        setaxes(log10(mydata.NonNml(:,ind)));
+        pcolor(X,Y, reshape( mydata.NonNml(:,ind), [N,N]));
+        setaxes(mydata.NonNml(:,ind));
         cb = findobj(gcf,'tag','Colorbar');title(cb,'log_{10}')
         titleline = ['Non-normality' tstampline];
         title(titleline)
