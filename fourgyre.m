@@ -251,23 +251,6 @@ else
     end
     
     
-    % Numerical Compressibility (quantifies error in computation of
-    % Jacobian)
-    if isfield(mydata,'Compr')
-        n = n+1; figure(n);
-        pcolor(X,Y, reshape( log10(abs(mydata.Compr(:,ind))), [N,N]));
-        setaxes(log10(abs(mydata.Compr(:,ind))));
-        cb = findobj(gcf,'tag','Colorbar');title(cb,'log_{10}')
-        titleline=['Numerical compressibility' tstampline];
-        title(titleline)
-        set(gcf,'name',titleline);
-        
-    else
-        disp('No Compr field (numerical compressibility) available')
-    end
-    
-
-    
     % Haller-Iacono shear
     if isfield(mydata,'hi_shear')
         n = n+1; figure(n);
@@ -297,6 +280,22 @@ else
     else
         disp('No hi_stretch field (Haller-Iacono stretch) available')
     end
+    
+    % Numerical Compressibility (quantifies error in computation of
+    % Jacobian)
+    if isfield(mydata,'Compr')
+        n = n+1; figure(n);
+        pcolor(X,Y, reshape( log10(abs(mydata.Compr(:,ind))), [N,N]));
+        setaxes(log10(abs(mydata.Compr(:,ind))));
+        cb = findobj(gcf,'tag','Colorbar');title(cb,'log_{10}')
+        titleline=['Numerical compressibility' tstampline];
+        title(titleline)
+        set(gcf,'name',titleline);
+        
+    else
+        disp('No Compr field (numerical compressibility) available')
+    end
+    
     
 end
 
