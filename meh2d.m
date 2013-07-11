@@ -85,7 +85,7 @@ for k = 1:K
     % defect: smallest distance between roots of the minimal polynomial,
     % relative to floating-point-representation tolerance on the norm of
     % matrix
-    quants.NonDefect(k) = mindist( roots( minpoly(J)  ) )/( norm(J); % mindist.m distributed with package
+    quants.NonDefect(k) = mindist( roots( minpoly(J)  ) )/norm(J); % mindist.m distributed with package
     
     % characteristic polynomial
     Cp = poly(J);
