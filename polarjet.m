@@ -224,7 +224,7 @@ else
         n = n+1; figure(n);
         pcolor(X,Y, reshape( mydata.NonNml(:,ind), [N,N]));
         setaxes(mydata.NonNml(:,ind));
-        cb = findobj(gcf,'tag','Colorbar');title(cb,'log_{10}')
+        cb = findobj(gcf,'tag','Colorbar');
         titleline = ['Non-normality' tstampline];
         title(titleline)
         set(gcf,'name',titleline);
