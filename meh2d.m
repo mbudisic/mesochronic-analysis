@@ -67,6 +67,7 @@ quants.NonDefect = zeros(size(Ts));
 spectral.Traces = zeros(size(Ts));
 spectral.Dets = zeros(size(Ts));
 
+% for each averaging interval
 for k = 1:K
     
     % select appropriate averaging interval and Jacobian matrix
@@ -79,10 +80,12 @@ for k = 1:K
     quants.FTLE(k) = ftle(T,J);
     
     % non-normality: Frobenius norm of the commutator of Jacobian
-    quants.NonNml(k) = norm( ctranspose(J)*J - J*ctranspose(J), 'fro' );
+    quants.NonNml(k) = norm( ctranspose(J)*J - J*ctranspose(J), 'fro' )/( norm(J,'fro')^2 );
     
-    % defect: smallest distance between roots of the minimal polynomial
-    quants.NonDefect(k) = mindist( roots( minpoly(J)  ) ); % mindist.m distributed with package
+    % defect: smallest distance between roots of the minimal polynomial,
+    % relative to floating-point-representation tolerance on the norm of
+    % matrix
+    quants.NonDefect(k) = mindist( roots( minpoly(J)  ) ) / eps(norm(J,'fro')); % mindist.m distributed with package
     
     % characteristic polynomial
     Cp = poly(J);
