@@ -109,7 +109,7 @@ if  isempty(mydata)
     % if file does not exist, simulate the system
     else
         disp(['Simulating ' filename]);        
-        Jdata = meh_simulation(@(t,x)vf_fourgyre(t,x,epsilon), t0, T, direction, method, ics, h, dp, order, tol);
+        Jdata = meh_simulation(@(t,x)vf_mezic(t,x,epsilon), t0, T, direction, method, ics, h, dp, order, tol);
         save(filename,'-struct', 'Jdata');
     end
     

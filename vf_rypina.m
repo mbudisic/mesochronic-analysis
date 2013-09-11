@@ -1,5 +1,5 @@
-function f = vf_polarjet(t,p)
-% VF_POLARJET(t,p)
+function f = vf_rypina(t,p)
+% VF_RYPINA(t,p)
 %
 % Running the function without arguments will run a showcase
 % demonstration of the flow, showing vector field arrows overlaying the

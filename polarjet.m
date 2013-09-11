@@ -108,7 +108,7 @@ if  isempty(mydata)
     % if file does not exist, simulate the system
     else
         disp(['Simulating ' filename]);        
-        Jdata = meh_simulation(@(t,x)vf_polarjet(t,x), t0, T, direction, 'ode', ics, h, dp, order, tol);
+        Jdata = meh_simulation(@(t,x)vf_rypina(t,x), t0, T, direction, 'ode', ics, h, dp, order, tol);
         save(filename,'-struct', 'Jdata');
     end
     
