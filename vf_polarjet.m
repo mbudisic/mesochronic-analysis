@@ -1,6 +1,10 @@
 function f = vf_polarjet(t,p)
 % VF_POLARJET(t,p)
 %
+% Running the function without arguments will run a showcase
+% demonstration of the flow, showing vector field arrows overlaying the
+% stream function.
+%
 % Vectorized ODE model of the atmospheric zonal jet around south pole
 % t - 1xN time vector
 % p - 2xN matrix of states (each column is a state)
@@ -11,9 +15,6 @@ function f = vf_polarjet(t,p)
 % decent range for p is [0,20] x [-4,4] box (in Megameters)
 % decent range for t is  [0,10] days
 %
-% Running the function without passing t, p will run a showcase
-% demonstration of the flow, showing vector field arrows overlaying the
-% stream function.
 %
 % For detailed parameter set see subfunction vf in source code, and
 % paper
@@ -37,7 +38,7 @@ if nargin < 1
         quiver(Xq, Yq, -reshape(dPsidy, Nq,Nq), reshape(dPsidx, Nq,Nq))
         xlabel('Mm')
         ylabel('Mm')
-        title(sprintf('T = %.2f days',t))
+        title(sprintf('Polar jet; Color is vorticity; T = %.2f days',t))
         hold off;
         caxis([-60,60]);
         pause(0.1);
