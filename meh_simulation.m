@@ -41,12 +41,16 @@ direction = sign(direction);
 
 fprintf(1, 'Running vector field %s\n in %+d direction.\n', func2str(f), direction);
 
-if strcmpi(method,'ode')
-    disp('Using ODE evolution');
-elseif strcmpi(method, 'fd')
-    disp('Using finite difference')
-else
-    error('mytype has to be either ODE or FD')
+allowed.ode_ref_frame = {1, 'ODE evolution, reference (static) frame'};
+allowed.ode_frenet_frame = {2, 'ODE evolution, Frenet (moving) frame'};
+allowed.fd_ref_frame = {3, 'Finite Difference, reference (static) frame'};
+
+try
+    sel = allowed.(method);
+    disp(sel{2});
+catch
+    error('Method: %s not allowed. Allowed methods: %s', method,...
+        [char(fields(allowed)), repmat(' ',numel(fields(allowed)),1)].');
 end
 
 fprintf(1,'h = %.2e\n', h);
@@ -94,18 +98,23 @@ end
 orderlist = nan(1,Npoints);
 
 % for every initial condition, evaluate mesochronic jacobian
-parfor k = 1:Npoints
+for k = 1:Npoints
     ic = ics(k, :).';
     
-    % Adams-Bashforth evolution methods
-    if strcmpi(method,'ode')
-        [mJ, retstep, sol, myorder] = evaluateJ_ode( order, ic, f, t0, Ts, direction, h, dp );
-        orderlist(k) = myorder;
+    switch sel{1}
         
-    % direct finite-difference method
-    else
-        orderlist(k) = 0;
-        mJ = evaluateJ_fd( ic, f, Ts, h, dp );
+        case allowed.ode_ref_frame{1}
+            [mJ, retstep, sol, myorder] = evaluateJ_ode( 'reference', order, ic, f, t0, Ts, direction, h, dp );
+            orderlist(k) = myorder;
+            
+        case allowed.ode_frenet_frame{1}
+            [mJ, retstep, sol, myorder] = evaluateJ_ode( 'frenet', order, ic, f, t0, Ts, direction, h, dp );
+            orderlist(k) = myorder;
+            
+        case allowed.fd_ref_frame{1}
+            orderlist(k) = 0;
+            mJ = evaluateJ_fd( ic, f, Ts, h, dp );
+            
     end
     
     % store the output

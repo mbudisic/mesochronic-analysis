@@ -1,4 +1,4 @@
-function mydata = fourgyre(mydata, T, N, direction)
+function mydata = fourgyre(mydata, T, N, direction, method)
 % retval = fourgyre(mydata, T, N, direction)
 %
 % A demo run for four gyre flow - simulation and visualization.
@@ -99,9 +99,9 @@ if  isempty(mydata)
     
     commonname = 'fourgyre';
     
-    filename = sprintf('%s_jac_o%d_N%d_%sT_%.1f.mat', commonname, order, N, dirlab, max(T));
+    filename = sprintf('%s_jac_%s_o%d_N%d_%sT_%.1f.mat', commonname, method, order, N, dirlab, max(T));
     
-    % if file exist, load Jacobian data
+    % if file exists, load Jacobian data
     if exist(filename,'file')
         disp(['Load ' filename]);
         Jdata = load(filename);
@@ -109,12 +109,12 @@ if  isempty(mydata)
     % if file does not exist, simulate the system
     else
         disp(['Simulating ' filename]);        
-        Jdata = meh_simulation(@(t,x)vf_fourgyre(t,x,epsilon), t0, T, direction, 'ode', ics, h, dp, order, tol);
+        Jdata = meh_simulation(@(t,x)vf_fourgyre(t,x,epsilon), t0, T, direction, method, ics, h, dp, order, tol);
         save(filename,'-struct', 'Jdata');
     end
     
     % analyze Jacobian data using mesohyperbolic analysis
-    filename = sprintf('%s_meh_o%d_N%d_%sT_%.1f.mat', commonname, order, N, dirlab, max(T));
+    filename = sprintf('%s_meh_%s_o%d_N%d_%sT_%.1f.mat', commonname, method, order, N, dirlab, max(T));
     MCdata = meh_analysis(T, Jdata.Jacobians, Jdata.Ndim, tol); %
     
     save(filename,'-struct', 'MCdata');
@@ -130,7 +130,7 @@ if  isempty(mydata)
     end
     
     % save joint data set
-    filename = sprintf('%s_o%d_N%d_%sT_%.1f.mat', commonname, order, N, dirlab, max(T));
+    filename = sprintf('%s_%s_o%d_N%d_%sT_%.1f.mat', commonname, method, order, N, dirlab, max(T));
     save(filename,'-struct', 'mydata');
     
 else
