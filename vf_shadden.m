@@ -49,7 +49,8 @@ end
 function [Psi,dPsidx, dPsidy] = vf(x,y,t)
 
 A = 0.10;
-omega = 2*pi/10;
+% omega = 2*pi/10; % as in the tutorial
+omega = 2*pi/5;
 epsilon = 0.25;  % .10; % magnitude of perturbation.
 
 
