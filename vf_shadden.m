@@ -5,7 +5,8 @@ function f = vf_shadden(t,p)
 % demonstration of the flow, showing vector field arrows overlaying the
 % stream function.
 %
-% Vectorized ODE model of the atmospheric zonal jet around south pole
+% Vectorized ODE model of the double-gyre with moving boundary, used by
+% Shawn Shadden as an example in his LCS tutorial
 % t - 1xN time vector
 % p - 2xN matrix of states (each column is a state)
 %
@@ -31,12 +32,12 @@ if nargin < 1
         [Psi,~,~] = vf(Xls(:).',Yls(:).',t);
         contourf(Xls, Yls, reshape(Psi, Nls,Nls));
         hold all
-        quiver(Xq, Yq, -reshape(dPsidy, Nq,Nq), reshape(dPsidx, Nq,Nq))
-        xlabel('Mm')
-        ylabel('Mm')
+        quiver(Xq, Yq, -reshape(dPsidy, Nq,Nq), reshape(dPsidx, Nq,Nq),'w')
+        xlabel('x')
+        ylabel('y')
         title(sprintf('Shadden double-gyre; Color is the stream function; T = %.2f ',t))
         hold off;
-%        caxis([-60,60]);
+        caxis([-0.1,0.1]);
         pause(0.1);
     end
 else

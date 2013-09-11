@@ -35,7 +35,7 @@ if nargin < 1
         [Psi,~,~] = vf(Xls(:).',Yls(:).',t);
         contourf(Xls, Yls, reshape(Psi, Nls,Nls));
         hold all
-        quiver(Xq, Yq, -reshape(dPsidy, Nq,Nq), reshape(dPsidx, Nq,Nq))
+        quiver(Xq, Yq, -reshape(dPsidy, Nq,Nq), reshape(dPsidx, Nq,Nq),'w')
         xlabel('Mm')
         ylabel('Mm')
         title(sprintf('Polar jet; Color is vorticity; T = %.2f days',t))
