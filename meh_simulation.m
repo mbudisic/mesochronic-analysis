@@ -98,7 +98,7 @@ end
 orderlist = nan(1,Npoints);
 
 % for every initial condition, evaluate mesochronic jacobian
-for k = 1:Npoints
+parfor k = 1:Npoints
     ic = ics(k, :).';
     
     switch sel{1}
