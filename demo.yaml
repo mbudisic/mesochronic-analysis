@@ -1,0 +1,15 @@
+simulationname : test
+model : twogyre
+method : [ode_frenet_frame, ode_ref_frame]
+minx : 0.0
+maxx : 2.0
+miny : 0.0
+maxy : 1.0
+Nx : 10
+Ny : 10
+order : 3
+tstep : 1e-2
+sstep : 1e-6
+direction : [fwd, bwd]
+t0 : [0]
+tdelta : 5.0
