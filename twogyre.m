@@ -82,9 +82,7 @@ if  isempty(mydata)
     dp = 1e-6; % spatial step for finite difference evaluation of inst. Jacobian
     tol = 1e-3; % tolerance on zero-matching criteria (irrelevant for 2d analysis)
     t0 = 0; % initial time
-    
-    epsilon = 0.1; % perturbation magnitude for the simulated flow
-    
+        
     % determine the grid of inital conditions
     icgrid = linspace(0,1,N);
     [X,Y] = meshgrid( 2*icgrid, icgrid);
