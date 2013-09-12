@@ -1,5 +1,5 @@
 function sims = meh2d_harness( yamlfile, names, dryrun )
-% MEH2D_HARNESS( yamlfile )
+% sims = meh2d_harness( yamlfile, names, dryrun )
 %
 % Reads a YAML configuration file and creates a set of
 % mesochronic analysis simulations, by looping over all possible
@@ -27,17 +27,21 @@ validateattributes( dryrun, {'logical'}, {})
 
 sims = expandconf(ReadYaml(yamlfile), names );
 
+fprintf(1,'Number of simulations expected: %d\n', numel(sims)) 
+
 if dryrun
     for s = sims
         disp(s.filename)
         s.params
     end
     error('!!!Dry run!!! Pass ''false'' the third argument or skip it.')
+else
+    for s = sims
+        disp(s.filename)
+    end
 end
 
 for s = sims
-    
-    
     disp(['Running simulation:', s.filename])
     s.params
     
