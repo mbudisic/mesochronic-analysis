@@ -42,17 +42,11 @@ else
 end
 
 for s = sims
-    disp(['Running simulation:', s.filename])
+    disp(['Running simulation:', s.filename]); tic;
     s.params
     
     %% simulation
-    
-    order = 3; % use 3rd order - safest before I check whether there are finite-precision errors in higher orders
-    h = 1e-2; % uniform timestep
-    dp = 1e-6; % spatial step for finite difference evaluation of inst. Jacobian
-    tol = 1e-3; % tolerance on zero-matching criteria (irrelevant for 2d analysis)
-    t0 = 0; % initial time
-        
+            
     % determine the grid of inital conditions
     icgridx = linspace(s.params.minx,s.params.maxx,s.params.Nx);
     icgridy = linspace(s.params.miny,s.params.maxy,s.params.Ny);
@@ -80,7 +74,6 @@ for s = sims
     end
             
             
-    
     jac_filename = [s.filename '.jac.mat'];
     meh_filename = [s.filename '.meh.mat'];
     yaml_filename = [s.filename '.yaml'];
@@ -108,6 +101,7 @@ for s = sims
         MCdata.params = char(WriteYaml( [], s.params ));
         save(meh_filename,'params','-struct', 'MCdata', '-v6');
     end
+    toc
 end
 
 

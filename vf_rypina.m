@@ -13,7 +13,7 @@ function f = vf_rypina(t,p)
 % length unit - 10^6 m
 %
 % decent range for p is [0,20] x [-4,4] box (in Megameters)
-% decent range for t is  [0,1] days
+% decent range for t is  [0,10] days - 1/tscale is 11
 % suggested timestep: 1e-3
 %
 % For detailed parameter set see subfunction vf in source code, and
