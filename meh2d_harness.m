@@ -89,8 +89,9 @@ for s = sims
                                s.params.method, ics, ...
                                s.params.tstep, s.params.sstep, ...
                                s.params.order, 1e-3);
-        Jdata.params = char(WriteYaml( [], s.params ));
-        save(jac_filename,'params','-struct', 'Jdata', '-v6');
+        Jdata.params = s.params;
+		Jdata.paramyaml = char(WriteYaml( [], s.params));
+        save(jac_filename,'-struct', 'Jdata', '-v6');
     end
     
     % analyze Jacobian data using mesohyperbolic analysis
@@ -98,8 +99,15 @@ for s = sims
         warning([meh_filename ' mesochronic analysis file already exists.']);
     else
         MCdata = meh_analysis(Jdata.T, Jdata.Jacobians, Jdata.Ndim, 1e-6); %
-        MCdata.params = char(WriteYaml( [], s.params ));
-        save(meh_filename,'params','-struct', 'MCdata', '-v6');
+        MCdata.params = s.params;
+
+		% copying analyses to MCdata
+		MCdata.T = Jdata.T;
+		MCdata.hi_stretch = Jdata.hi_stretch;
+		MCdata.hi_shear = Jdata.hi_shear;
+
+		MCdata.paramyaml = char(WriteYaml( [], s.params));
+        save(meh_filename,'-struct', 'MCdata', '-v6');
     end
     toc
 end
