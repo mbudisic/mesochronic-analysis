@@ -73,7 +73,8 @@ for s = sims
             vf = @(t,x)vf_harmonic(t,x);
         case { 'nonlinear'}
             vf = @(t,x)vf_nonlin(t,x);
-            
+        case { 'moving'}
+            vf = @(t,x)vf_moving(t,x);
         otherwise
             error('Model not recognized')
     end
