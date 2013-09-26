@@ -25,7 +25,7 @@ if nargin < 1
     [Xq,Yq] = meshgrid(linspace(0,1,Nq),linspace(0,1,Nq)); 
     Nls = 200;
     [Xls,Yls] = meshgrid(linspace(0,1,Nls),linspace(0,1,Nls)); 
-    epsilon = 0.1;
+    epsilon = 1.1;
     for t = linspace(0,10,100)
         [~,dPsidx, dPsidy] = vf(Xq(:).',Yq(:).',t, epsilon);
         [Psi,~,~] = vf(Xls(:).',Yls(:).',t, epsilon);
@@ -57,5 +57,5 @@ dPsiPdx = -sin(2*pi*x).*cos(2*pi*y);
 dPsiPdy = -cos(2*pi*x).*sin(2*pi*y);
 
 Psi = PsiU + epsilon*cos(2*pi*t).*PsiP;
-dPsidx = dPsiUdx + epsilon*dPsiPdx;
-dPsidy = dPsiUdy + epsilon*dPsiPdy;
+dPsidx = dPsiUdx + epsilon*cos(2*pi*t)*dPsiPdx;
+dPsidy = dPsiUdy + epsilon*cos(2*pi*t)*dPsiPdy;

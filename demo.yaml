@@ -5,8 +5,8 @@ minx : 0.0
 maxx : 2.0
 miny : 0.0
 maxy : 1.0
-Nx : 10
-Ny : 10
+Nx : 50
+Ny : 50
 order : 3
 tstep : 1e-2
 sstep : 1e-6
