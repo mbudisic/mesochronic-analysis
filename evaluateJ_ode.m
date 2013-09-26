@@ -19,7 +19,7 @@ validateattributes(direction, {'numeric'}, {'scalar', 'real', 'nonzero'});
 validateattributes(T, {'numeric'}, {'positive'});
 
 T = sort(T);
-assert( min(diff([t0;T(:)])) > h, 'return steps should differ by more than integration step')
+assert( min(diff([t0;t0+T(:)])) > h, 'return steps should differ by more than integration step')
 assert( h <= min(T), 'time step should be smaller than integration length' )
 assert( dp < 1, 'dp should be small')
 
