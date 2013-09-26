@@ -69,6 +69,11 @@ for s = sims
             vf = @(t,x)vf_shadden(t,x);
         case { 'mezic', 'fourgyre'}
             vf = @(t,x)vf_mezic(t,x, s.params.epsilon);
+        case { 'harmonic'}
+            vf = @(t,x)vf_harmonic(t,x);
+        case { 'nonlinear'}
+            vf = @(t,x)vf_nonlin(t,x);
+            
         otherwise
             error('Model not recognized')
     end
