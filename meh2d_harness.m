@@ -48,8 +48,10 @@ for s = sims
     %% simulation
             
     % determine the grid of inital conditions
-    icgridx = linspace(s.params.minx,s.params.maxx,s.params.Nx);
-    icgridy = linspace(s.params.miny,s.params.maxy,s.params.Ny);
+    dx = s.params.maxx-s.params.minx;
+    dy = s.params.maxy-s.params.miny;
+    icgridx = linspace(s.params.minx+dx/2/s.params.Nx,s.params.maxx-dx/2/s.params.Nx,s.params.Nx);
+    icgridy = linspace(s.params.miny+dy/2/s.params.Ny,s.params.maxy-dy/2/s.params.Ny,s.params.Ny);
     
     [X,Y] = meshgrid( icgridx, icgridy);
     ics = [X(:), Y(:)];
@@ -75,6 +77,8 @@ for s = sims
             vf = @(t,x)vf_nonlin(t,x);
         case { 'moving'}
             vf = @(t,x)vf_moving(t,x);
+        case { 'jet'}
+            vf = @(t,x)vf_jet(t,x);            
         otherwise
             error('Model not recognized')
     end

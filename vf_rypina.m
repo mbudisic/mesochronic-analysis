@@ -30,7 +30,9 @@ if nargin < 1
     Nls = 200;
     [Xls,Yls] = meshgrid(linspace(0,20,Nls),linspace(-4,4,Nls)); % unit - 10^6 m
     
-    for t = linspace(0,10,100)
+    ts = linspace(0,4.5,99);
+    for k = 1:100;
+        t = ts(k);
         [~,dPsidx, dPsidy] = vf(Xq(:).',Yq(:).',t);
         [Psi,~,~] = vf(Xls(:).',Yls(:).',t);
         contourf(Xls, Yls, reshape(Psi, Nls,Nls));
@@ -38,9 +40,10 @@ if nargin < 1
         quiver(Xq, Yq, -reshape(dPsidy, Nq,Nq), reshape(dPsidx, Nq,Nq),'w')
         xlabel('Mm')
         ylabel('Mm')
-        title(sprintf('Polar jet; Color is vorticity; T = %.2f days',t))
+        title(sprintf('Rypina polar jet; T = %.2f days',t))
         hold off;
         caxis([-60,60]);
+        export_fig(sprintf('vf_rypina_%03d',k),'-png')        
         pause(0.1);
     end
 else

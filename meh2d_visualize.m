@@ -97,7 +97,7 @@ if isfield(Mdata,'FTLE')
     titleline =['FTLE' tstampline];
     title(titleline)
     set(gcf,'name',titleline);
-    
+    set(gcf, 'color', 'white')
     
 else
     disp('No FTLE field (Finite-Time Lyapunov Exponent) available')
@@ -112,7 +112,7 @@ if isfield(Mdata,'NonNml')
     titleline = ['Non-normality' tstampline];
     title(titleline)
     set(gcf,'name',titleline);
-    
+    set(gcf, 'color', 'white')
 else
     disp('No NonNml field (deviation from normal Jacobian) available')
 end
@@ -128,7 +128,7 @@ if isfield(Mdata,'NonDefect')
     titleline= ['Non-defectiveness' tstampline];
     title(titleline)
     set(gcf,'name',titleline);
-    
+    set(gcf, 'color', 'white')
 else
     disp('No NonDefect field (deviation from defective Jacobian) available')
 end
@@ -138,13 +138,13 @@ end
 if isfield(Mdata,'hi_shear')
     n = n+1; newfigure(n);names{n} = 'hi_shear';
     pcolor(X,Y, reshape( signedlog10(Mdata.hi_shear(:,ind)), [params.Ny, params.Nx]));
-    setaxes(params, signedlog10(Mdata.hi_shear(:,ind)));
+    setaxes(params, signedlog10(Mdata.hi_shear(:,ind)),true);
     colormap(diverging_map(linspace(0,1,64), [0.7,0,0],[0,0,0.7]))
     cb = findobj(gcf,'tag','Colorbar');title(cb,'sign(x)  log_{10}(1+|x|)')
     titleline=['Haller-Iacono shear' tstampline];
     title(titleline)
     set(gcf,'name',titleline);
-    
+    set(gcf, 'color', 'white')
 else
     disp('No hi_shear field (Haller-Iacono shear) available')
 end
@@ -153,13 +153,13 @@ end
 if isfield(Mdata,'hi_stretch')
     n = n+1; newfigure(n);names{n} = 'hi_stretch';
     pcolor(X,Y, reshape( Mdata.hi_stretch(:,ind), [params.Ny, params.Nx]));
-    setaxes(params, Mdata.hi_stretch(:,ind));
+    setaxes(params, Mdata.hi_stretch(:,ind),true);
     colormap(diverging_map(linspace(0,1,64), [0.7,0,0],[0,0,0.7]))
     cb = findobj(gcf,'tag','Colorbar');
     titleline=['Haller-Iacono stretch' tstampline];
     title(titleline)
     set(gcf,'name',titleline);
-    
+    set(gcf, 'color', 'white')
 else
     disp('No hi_stretch field (Haller-Iacono stretch) available')
 end
@@ -174,7 +174,7 @@ if isfield(Mdata,'Compr')
     titleline=['Numerical compressibility' tstampline];
     title(titleline)
     set(gcf,'name',titleline);
-    
+    set(gcf, 'color', 'white')
 else
     disp('No Compr field (numerical compressibility) available')
 end
@@ -212,7 +212,7 @@ v = log10( 1 + abs(u) ) .* sign(u);
 end
 
 %%
-function retval = setaxes(params, fulldata)
+function retval = setaxes(params, fulldata, symmetric)
 % Helper function for setting axes appropriately
 shading flat; axis([params.minx, params.maxx, params.miny, params.maxy]);
 colorbar
@@ -228,9 +228,17 @@ axis square
 xlabel('x')
 ylabel('y')
 
+try
 if exist('fulldata','var')
-    caxis( prctile(fulldata(:), [1, 99]) );
-    retval = prctile(fulldata(:), [1, 99]);
+    retval = prctile(fulldata(:), [10, 90]);
+    if exist('symmetric','var') & symmetric
+        caxis( max(abs(retval))*[-1,1] );
+    else
+        caxis(retval);
+    end
+end
+   
+catch
 end
 end
 

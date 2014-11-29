@@ -25,8 +25,10 @@ if nargin < 1
     [Xq,Yq] = meshgrid(linspace(0,1,Nq),linspace(0,1,Nq)); 
     Nls = 200;
     [Xls,Yls] = meshgrid(linspace(0,1,Nls),linspace(0,1,Nls)); 
-    epsilon = 1.1;
-    for t = linspace(0,10,100)
+    epsilon = 0.1;
+    ts = linspace(0,10,100);
+    for k = 1:100;
+        t = ts(k);
         [~,dPsidx, dPsidy] = vf(Xq(:).',Yq(:).',t, epsilon);
         [Psi,~,~] = vf(Xls(:).',Yls(:).',t, epsilon);
         contourf(Xls, Yls, reshape(Psi, Nls,Nls));
@@ -37,7 +39,8 @@ if nargin < 1
         title(sprintf('Mezic four-gyre; Color is the stream function; T = %.2f ',t))
         hold off;
         caxis([-0.15,0.15]);
-        pause(0.1);
+        export_fig(sprintf('vf_mezic_%03d',k),'-png')
+        %pause(0.1);
     end
 else
     [~,dPsidx, dPsidy] = vf(p(1,:),p(2,:),t, epsilon);
